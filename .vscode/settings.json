@@ -1,0 +1,25 @@
+{
+  "editor.formatOnSave": true,
+  "editor.tabSize": 4,
+  "editor.insertSpaces": false,
+  "files.associations": {
+    "*.gd": "gdscript",
+    "*.godot": "ini",
+    "*.tscn": "ini",
+    "*.tres": "ini"
+  },
+  "godotTools.editorPath.godot4": "/Applications/Godot.app/Contents/MacOS/Godot",
+  "godotTools.lsp.serverPort": 6005,
+  "[gdscript]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": false,
+    "editor.formatOnSave": true
+  },
+  "search.exclude": {
+    "**/.godot": true,
+    "**/node_modules": true
+  },
+  "files.exclude": {
+    "**/.godot": true
+  }
+}

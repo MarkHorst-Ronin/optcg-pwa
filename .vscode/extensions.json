@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "geequlim.godot-tools",
+    "ms-vscode.vscode-json",
+    "esbenp.prettier-vscode",
+    "streetsidesoftware.code-spell-checker",
+    "mhutchie.git-graph"
+  ]
+}

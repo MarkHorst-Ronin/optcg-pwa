@@ -1,0 +1,35 @@
+# Godot engine
+.godot/
+*.uid
+
+# Export presets
+export_presets.cfg
+
+# Mono / .NET (not used but just in case)
+.mono/
+data_*/
+mono_crash.*.json
+
+# VS Code
+.vscode/*.log
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# Node.js (API folder)
+api/node_modules/
+api/.env
+api/.env.local
+
+# Build outputs
+builds/
+dist/
+
+# Logs
+*.log

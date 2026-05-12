@@ -1,0 +1,31 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; but the file format is documented here:
+; https://docs.godotengine.org/en/stable/tutorials/best_practices/project_organization.html
+
+config_version=5
+
+[application]
+
+config/name="OPTCG - One Piece TCG Digital"
+config/description="A faithful digital implementation of the One Piece Card Game by Bandai"
+run/main_scene="res://scenes/ui/MainMenu.tscn"
+config/features=PackedStringArray("4.3", "GL Compatibility")
+config/icon="res://icon.svg"
+
+[autoload]
+
+GameState="*res://scripts/autoloads/GameState.gd"
+CardDatabase="*res://scripts/autoloads/CardDatabase.gd"
+GameConfig="*res://scripts/autoloads/GameConfig.gd"
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/size/resizable=true
+window/stretch/mode="canvas_items"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
