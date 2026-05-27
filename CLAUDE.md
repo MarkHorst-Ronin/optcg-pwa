@@ -19,26 +19,26 @@ A fully rules-accurate digital implementation of the **One Piece Card Game (OPTC
 ## Repository Structure
 
 ```
-optcg/
+optcg-pwa/
 ├── CLAUDE.md                    ← You are here
 ├── PRD.md                       ← Full product requirements
 ├── ARCHITECTURE.md              ← Technical stack and data flows
-├── AGENTS.md                    ← Parallel agent build plan
+├── AGENTS.md                    ← Parallel agent build plan (13 agents, 5 waves)
+├── README.md                    ← macOS setup guide and dev workflow
 │
-├── project.godot
-├── export_presets.cfg
+├── project.godot                ← Godot 4.3 project config (GL Compatibility, 1920×1080)
+├── index.html                   ← Web export entry point
 │
 ├── data/
 │   └── cards/
-│       ├── OP01.json            ← Romance Dawn card set
+│       ├── OP01.json            ← Romance Dawn card set (121 cards — Agent 1 fills)
 │       └── ...                  ← Future sets added here
 │
 ├── scenes/
 │   ├── game/
 │   │   ├── GameBoard.tscn
 │   │   ├── TurnManager.tscn
-│   │   ├── BattleResolver.tscn
-│   │   └── DamageHandler.tscn
+│   │   └── BattleResolver.tscn
 │   ├── zones/
 │   │   ├── LeaderZone.tscn
 │   │   ├── CharacterZone.tscn
@@ -55,6 +55,10 @@ optcg/
 │   │   ├── StageCard.tscn
 │   │   └── DonCard.tscn
 │   └── ui/
+│       ├── MainMenu.tscn        ← Run/Main scene
+│       ├── LoginScreen.tscn
+│       ├── DeckBuilder.tscn
+│       ├── WinLoseScreen.tscn
 │       ├── PhaseIndicator.tscn
 │       ├── PowerCompare.tscn
 │       ├── TriggerPrompt.tscn
@@ -64,35 +68,79 @@ optcg/
 │
 ├── scripts/
 │   ├── autoloads/
-│   │   ├── GameState.gd         ← Singleton: all live game state
-│   │   ├── CardDatabase.gd      ← Singleton: all card data loaded from JSON
-│   │   └── GameConfig.gd        ← Singleton: settings and constants
+│   │   ├── GameState.gd         ← Singleton: all live game state [STUB]
+│   │   ├── CardDatabase.gd      ← Singleton: card data loaded from JSON [STUB]
+│   │   └── GameConfig.gd        ← Singleton: settings and constants [COMPLETE]
 │   ├── core/
-│   │   ├── TurnManager.gd
-│   │   ├── BattleResolver.gd
-│   │   ├── DamageHandler.gd
-│   │   ├── EffectQueue.gd
-│   │   ├── KeywordHandler.gd
-│   │   └── WinConditionChecker.gd
+│   │   ├── TurnManager.gd       ← 5-phase state machine [STUB]
+│   │   ├── BattleResolver.gd    ← 4-step combat flow [STUB]
+│   │   ├── DamageHandler.gd     ← Life/trigger processing [STUB]
+│   │   ├── EffectQueue.gd       ← FIFO async effect resolver [STUB]
+│   │   ├── KeywordHandler.gd    ← Keyword logic (Rush, Blocker, etc.) [STUB]
+│   │   └── WinConditionChecker.gd ← Win/loss detection [STUB]
 │   ├── data/
-│   │   ├── CardData.gd          ← CardData resource class
-│   │   ├── DeckData.gd          ← DeckData resource class
-│   │   ├── EffectData.gd        ← EffectData resource class
-│   │   ├── CardInstance.gd      ← Runtime card with live state
-│   │   └── DeckValidator.gd
+│   │   ├── CardData.gd          ← CardData resource + all enums [COMPLETE]
+│   │   ├── CardInstance.gd      ← Runtime card with live state [COMPLETE]
+│   │   ├── EffectData.gd        ← Effect metadata resource [COMPLETE]
+│   │   ├── DeckData.gd          ← Deck container resource [COMPLETE]
+│   │   ├── DeckValidator.gd     ← Deck rule validation [COMPLETE]
+│   │   └── CardFilter.gd        ← Search/filter for card database [COMPLETE]
 │   ├── ai/
-│   │   └── AIOpponent.gd
+│   │   └── AIOpponent.gd        ← 3-tier AI (Easy/Medium/Hard) [STUB]
 │   ├── net/
-│   │   ├── GameServer.gd        ← Host-authoritative RPC
-│   │   └── SteamLobby.gd
+│   │   ├── GameServer.gd        ← Host-authoritative RPC handlers [STUB]
+│   │   ├── SteamLobby.gd        ← GodotSteam lobby management [STUB]
+│   │   └── AuthManager.gd       ← Firebase Auth client [STUB]
 │   └── ui/
-│       ├── BoardView.gd
-│       ├── CardView.gd
-│       └── HandView.gd
+│       ├── BoardView.gd         ← Board visualization [STUB]
+│       ├── CardView.gd          ← Card rendering + 8 visual states [STUB]
+│       └── DeckBuilderView.gd   ← Deck builder UI logic [STUB]
 │
-└── resources/
-    └── card_database/           ← Optional .tres resources if needed
+└── api/                         ← Node.js Cloud Run backend
+    ├── index.js                 ← Express server entry point [STUB]
+    ├── package.json             ← express, pg, firebase-admin, uuid
+    ├── Dockerfile
+    ├── .env.example
+    ├── db/
+    │   └── schema.sql           ← PostgreSQL schema [COMPLETE]
+    └── routes/
+        ├── auth.js              ← Login/register [STUB]
+        ├── decks.js             ← GET/POST/DELETE decks [STUB]
+        ├── matches.js           ← Match history [STUB]
+        └── license.js           ← License key validation [STUB]
 ```
+
+---
+
+## Implementation Status
+
+| File | Status | Owner Agent |
+|---|---|---|
+| `scripts/autoloads/GameConfig.gd` | COMPLETE | — |
+| `scripts/data/CardData.gd` | COMPLETE (enums + fields) | Agent 1 |
+| `scripts/data/CardInstance.gd` | COMPLETE | Agent 2 |
+| `scripts/data/EffectData.gd` | COMPLETE | Agent 1 |
+| `scripts/data/DeckData.gd` | COMPLETE | Agent 9 |
+| `scripts/data/DeckValidator.gd` | COMPLETE | Agent 9 |
+| `scripts/data/CardFilter.gd` | COMPLETE | Agent 9 |
+| `api/db/schema.sql` | COMPLETE | Agent 6 |
+| `data/cards/OP01.json` | EMPTY — needs 121 cards | Agent 1 |
+| `scripts/autoloads/GameState.gd` | STUB | Agent 2 |
+| `scripts/autoloads/CardDatabase.gd` | STUB | Agent 1 |
+| `scripts/core/TurnManager.gd` | STUB | Agent 3 |
+| `scripts/core/BattleResolver.gd` | STUB | Agent 4 |
+| `scripts/core/DamageHandler.gd` | STUB | Agent 4 |
+| `scripts/core/EffectQueue.gd` | STUB | Agent 4 |
+| `scripts/core/KeywordHandler.gd` | STUB | Agent 11 |
+| `scripts/core/WinConditionChecker.gd` | STUB | Agent 11 |
+| `scripts/ai/AIOpponent.gd` | STUB | Agent 10 |
+| `scripts/net/GameServer.gd` | STUB | Agent 12 |
+| `scripts/net/SteamLobby.gd` | STUB | Agent 12 |
+| `scripts/net/AuthManager.gd` | STUB | Agent 7 |
+| `scripts/ui/BoardView.gd` | STUB | Agent 8 |
+| `scripts/ui/CardView.gd` | STUB | Agent 5 |
+| `scripts/ui/DeckBuilderView.gd` | STUB | Agent 9 |
+| All `api/routes/*.js` | STUB | Agents 6, 7 |
 
 ---
 
@@ -134,12 +182,27 @@ cost: int                # DON!! to play
 power: int               # Base power
 life: int                # Leader only
 counter: int             # 0 / 1000 / 2000
+attributes: Array[Attribute]  # [STRIKE, SLASH, ...]
+types: Array[String]     # ["Supernovas", "Straw Hat Crew"]
 keywords: Array[Keyword] # [RUSH, BLOCKER, ...]
 effects: Array[EffectData]
 trigger_effect: EffectData  # null if none
 art: String              # path to texture
 rarity: String           # C / U / R / SR / L
 set_id: String           # "OP01"
+```
+
+### CardData Enums (all defined in CardData.gd)
+```gdscript
+enum CardType  { LEADER, CHARACTER, EVENT, STAGE, DON }
+enum Color     { RED, GREEN, BLUE, PURPLE, BLACK, YELLOW }
+enum Keyword   { RUSH, RUSH_CHARACTER, DOUBLE_ATTACK, BANISH, BLOCKER, TRIGGER, COUNTER, DON_X, DON_MINUS }
+enum Attribute { SLASH, STRIKE, RANGED, SPECIAL, WISDOM, UNKNOWN }
+enum EffectType { DRAW, SEARCH, DISCARD, BOUNCE, TRASH, POWER_MOD, COST_REDUCE, REST_TARGET,
+                  UNREST, ADD_LIFE, REMOVE_LIFE, LOOK_LIFE, REORDER_LIFE, BANISH_TARGET,
+                  PLAY_FROM_TRASH, GIVE_DON, CANNOT_ATTACK, CANNOT_BE_KOD }
+enum EffectTiming { ON_PLAY, ON_KO, WHEN_ATTACKING, WHEN_ATTACKED, MAIN, ACTIVATE,
+                    END_OF_TURN, END_OPP_TURN, TRIGGER, COUNTER, DON_X, PERMANENT }
 ```
 
 ### CardInstance (runtime — mutable during game)
@@ -152,6 +215,7 @@ perm_power_mods: Array   # cleared at end of turn or as specified
 owner_id: int            # 0 or 1
 turns_on_field: int      # 0 = played this turn (blocked from attacking unless Rush)
 ```
+Key method: `get_total_power() -> int` — NEVER clamps to 0; returns actual negative value per rule 4.
 
 ### GameState (autoload singleton)
 ```gdscript
@@ -167,6 +231,18 @@ life_areas: Array[Array]            # [[p1 life], [p2 life]]
 trash_piles: Array[Array]           # [[p1 trash], [p2 trash]]
 active_player: int                  # 0 or 1
 turn_number: int
+```
+Signals: `card_moved`, `don_attached`, `don_returned`, `state_reset`
+
+### CardFilter (search helper)
+```gdscript
+colors: Array        # OR logic across colors
+card_type: CardType  # exact match; -1 = any
+min_cost: int
+max_cost: int
+keywords: Array      # AND logic
+set_ids: Array       # OR logic
+text: String         # matches card_name or description
 ```
 
 ---
@@ -237,18 +313,23 @@ Source: Official Bandai OPTCG Comprehensive Rules v1.2.0 (January 16, 2026).
 
 ## What Each Agent Is Responsible For
 
-See AGENTS.md for full agent specifications. Summary:
+See AGENTS.md for full specifications with deliverables and DoD checklists.
 
-| Agent | Module | Entry Point |
+| Agent | Module | Primary Files |
 |---|---|---|
-| Agent 1 | Card Database (JSON + CardData.gd) | data/cards/OP01.json |
-| Agent 2 | GameState + TurnManager | scripts/autoloads/GameState.gd |
-| Agent 3 | BattleResolver + EffectQueue | scripts/core/BattleResolver.gd |
-| Agent 4 | AI Opponent | scripts/ai/AIOpponent.gd |
-| Agent 5 | Board UI + Card Rendering | scenes/game/GameBoard.tscn |
-| Agent 6 | Cloud Run API + PostgreSQL Schema | api/ (separate repo) |
-| Agent 7 | Auth + Player Accounts | api/auth/ |
-| Agent 8 | Deck Builder UI | scenes/ui/DeckBuilder.tscn |
+| Agent 1 | Card Database — JSON + parsing | `data/cards/OP01.json`, `CardDatabase.gd`, `CardData.gd` (enums already defined) |
+| Agent 2 | GameState — state container | `scripts/autoloads/GameState.gd` |
+| Agent 3 | TurnManager — 5-phase state machine | `scripts/core/TurnManager.gd` |
+| Agent 4 | BattleResolver + EffectQueue + DamageHandler | `scripts/core/BattleResolver.gd`, `EffectQueue.gd`, `DamageHandler.gd` |
+| Agent 5 | Card Rendering + CardView | `scripts/ui/CardView.gd`, `scenes/cards/*.tscn` |
+| Agent 6 | Cloud Run API + PostgreSQL | `api/` (Node.js backend) |
+| Agent 7 | Firebase Auth — login/register | `api/routes/auth.js`, `scripts/net/AuthManager.gd` |
+| Agent 8 | Board UI + Zones | `scripts/ui/BoardView.gd`, `scenes/game/GameBoard.tscn`, `scenes/zones/*.tscn` |
+| Agent 9 | Deck Builder UI | `scripts/ui/DeckBuilderView.gd`, `scenes/ui/DeckBuilder.tscn` |
+| Agent 10 | AI Opponent (Easy/Medium/Hard) | `scripts/ai/AIOpponent.gd` |
+| Agent 11 | KeywordHandler + WinConditionChecker | `scripts/core/KeywordHandler.gd`, `WinConditionChecker.gd` |
+| Agent 12 | Online Multiplayer + GameServer | `scripts/net/GameServer.gd`, `SteamLobby.gd` |
+| Agent 13 | Integration + Full Game Loop + Polish | All scenes, UI flow, export presets |
 
 ---
 
@@ -288,8 +369,7 @@ These are the contracts that agents must agree on before building.
 }
 ```
 
-### Agent 2 → Agent 3: GameState interface
-Agent 3 (BattleResolver) calls these GameState methods:
+### Agent 2 → Agent 4: GameState interface (BattleResolver calls these)
 ```gdscript
 GameState.get_leader(player_idx: int) -> CardInstance
 GameState.get_characters(player_idx: int) -> Array[CardInstance]
@@ -299,10 +379,12 @@ GameState.add_to_hand(player_idx: int, card: CardInstance) -> void
 GameState.send_to_trash(card: CardInstance, player_idx: int) -> void
 GameState.get_don_count(player_idx: int) -> int
 GameState.can_attack(player_idx: int, card_id: String) -> bool
+GameState.get_valid_attack_targets(player_idx: int) -> Array
+GameState.move_card(card, from_zone, to_zone, player_idx: int) -> void
+GameState.return_attached_don(card: CardInstance, as_active: bool) -> void
 ```
 
-### Agent 2 → Agent 4: GameState clone interface
-AI clones game state before simulating actions:
+### Agent 2 → Agent 10: GameState clone interface (AI simulation)
 ```gdscript
 GameState.clone() -> GameState
 GameState.get_playable_cards(player_idx: int, budget: int) -> Array[CardInstance]
@@ -310,14 +392,38 @@ GameState.get_attackable(player_idx: int) -> Array[CardInstance]
 GameState.apply_play(card: CardInstance, player_idx: int) -> void
 ```
 
-### Agent 6 → Agent 2: API endpoints expected by game
+### Agent 6/7 → Agent 2: API endpoints expected by the Godot client
 ```
 POST /api/auth/login           → { uid, token }
+POST /api/auth/register        → { uid, token }
 GET  /api/decks/{uid}          → Array[DeckData]
 POST /api/decks/{uid}          → save deck
+DELETE /api/decks/{uid}/{id}   → delete deck
 POST /api/matches/result       → save match result
-GET  /api/cards/validate-key   → { valid: bool }
+GET  /api/license/validate-key → { valid: bool }
 ```
+
+### Agent 7 → Godot: AuthManager signals
+```gdscript
+signal login_complete(uid: String, display_name: String)
+signal login_failed(error: String)
+signal logout_complete()
+```
+
+---
+
+## Backend API (api/)
+
+The `api/` directory is a **Node.js + Express** backend deployed to Google Cloud Run.
+
+- **Runtime:** Node 20 LTS
+- **Database:** PostgreSQL 14+ (shared Cloud SQL instance `houseof-m-apps`)
+- **Auth:** Firebase Admin SDK — validates Firebase ID tokens
+- **Schema:** `api/db/schema.sql` — tables: `players`, `decks`, `matches`, `licenses`
+- **Entry point:** `api/index.js` — mounts routes under `/api/`
+- **Local dev:** `cd api && cp .env.example .env && npm install && npm run dev`
+
+The Godot client talks to this API only at game startup (auth + deck fetch). Never mid-match.
 
 ---
 
@@ -331,6 +437,8 @@ GET  /api/cards/validate-key   → { valid: bool }
 - Do not use polling for multiplayer state — use Godot RPC signals.
 - Do not send opponent hand card IDs over the network. Ever.
 - Do not add any monetisation logic inside gameplay code — keep it in the API layer.
+- Do not create `DamageHandler.tscn` — DamageHandler is a script-only node, not a scene.
+- Do not add `HandView.gd` — hand display is handled by `BoardView.gd` and zone scenes.
 
 ---
 
@@ -339,15 +447,15 @@ GET  /api/cards/validate-key   → { valid: bool }
 | Resource | Value |
 |---|---|
 | GCP Project | houseof-m-apps |
-| Cloud Run instance | https://n8n-116267842979.us-central1.run.app |
+| Cloud Run instance (n8n) | https://n8n-116267842979.us-central1.run.app |
 | Cloud SQL | PostgreSQL, existing N8N_ENCRYPTION_KEY |
 | Airtable base | appxj1oWnsbZsrNfR (Lead Gen base) |
 | Cloudflare | Workers as API gateway |
 
-New resources needed:
+New resources needed for OPTCG:
 - GCS bucket for game installer storage
 - New Cloud Run service for OPTCG game API (separate from n8n instance)
-- New PostgreSQL database/schema for OPTCG player data (can share instance)
+- New PostgreSQL database/schema for OPTCG player data (can share Cloud SQL instance)
 
 ---
 
