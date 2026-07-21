@@ -1,0 +1,1003 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SDN Console — Dispatch UI Study V2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Oswald:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* Phosphor-amber palette calibrated to Dispatch's warm monitor aesthetic */
+    --bg:#060a14;
+    --panel:#0f1828;
+    --panel2:#162034;
+    --edge:#020508;
+    --hair:#243550;
+    --text:#e0ecff;
+    --muted:#8faac8;
+    --yellow:#1e5aff;
+    --amber:#1440cc;
+    --orange:#0a28a0;
+    --red:#c81818;
+    --green:#1cb858;
+    --blue:#2478c8;
+  }
+  *{box-sizing:border-box}
+
+  /* ── room ── */
+  html{background:#020203;min-height:100vh}
+  body{
+    margin:0;min-height:100vh;
+    background:
+      radial-gradient(circle at 12% -4%, rgba(30,90,255,.09), transparent 32%),
+      radial-gradient(circle at 88% 102%, rgba(10,40,160,.08), transparent 30%),
+      linear-gradient(180deg,#060a14 0%,#04070f 55%,#020408 100%);
+    padding:28px 20px;
+    color:var(--text);
+    font-family:Oswald,"Barlow Condensed",Arial,sans-serif;
+    font-size:16.5px;letter-spacing:.01em;
+  }
+
+  /* ── console UI ── */
+  .wrap{max-width:1520px;margin:0 auto;position:relative}
+  .console{background:var(--bg);border:2px solid var(--hair);border-radius:16px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.65)}
+
+  /* masthead */
+  .masthead{
+    position:relative;padding:20px 24px 18px;
+    border-bottom:3px solid var(--edge);
+    background:linear-gradient(180deg,#111926,#0b1020);
+    display:flex;justify-content:space-between;gap:20px;
+    align-items:flex-end;flex-wrap:wrap;
+  }
+  .masthead:after{
+    content:"";position:absolute;left:0;right:0;bottom:-3px;height:6px;
+    background:repeating-linear-gradient(-45deg, var(--yellow) 0 16px, var(--edge) 16px 26px);
+  }
+  .stamp{
+    display:inline-block;font-size:12.5px;font-weight:600;
+    letter-spacing:.3em;text-transform:uppercase;
+    color:var(--edge);background:var(--yellow);
+    padding:5px 12px 4px;transform:skewX(-8deg);
+    box-shadow:3px 3px 0 var(--edge);
+  }
+  h1{
+    margin:14px 0 0;
+    font-family:"Archivo Black",Oswald,sans-serif;
+    font-size:clamp(32px,4.6vw,54px);
+    line-height:.98;letter-spacing:.01em;text-transform:uppercase;
+    color:var(--yellow);
+    text-shadow:3px 3px 0 var(--edge),0 0 40px rgba(30,90,255,.5);
+  }
+  h1 .white{color:var(--text)}
+  .masthead .sub{margin-top:10px;color:var(--muted);max-width:660px;line-height:1.5;font-weight:400}
+  .verlinks{margin-top:8px;font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+  .verlinks a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted)}
+  .verlinks a:hover{color:var(--yellow);border-color:var(--yellow)}
+  .verlinks b{color:var(--yellow);margin-right:10px}
+  .shiftcard{
+    text-align:right;background:var(--edge);
+    border:1px solid var(--hair);padding:10px 16px 12px;
+    box-shadow:4px 4px 0 rgba(0,0,0,.55);
+  }
+  .shiftcard .lbl{font-size:11.5px;font-weight:600;letter-spacing:.3em;color:var(--muted);text-transform:uppercase}
+  .shiftcard .t{
+    font-family:"Archivo Black",sans-serif;
+    font-size:34px;color:var(--yellow);
+    font-variant-numeric:tabular-nums;
+    text-shadow:0 0 28px rgba(30,90,255,.65);
+  }
+
+  .deck{padding:18px;display:grid;gap:16px}
+
+  /* tabs */
+  .tabs{display:flex;flex-wrap:wrap;gap:10px}
+  .tab{
+    cursor:pointer;
+    font-family:Oswald,sans-serif;font-weight:600;
+    font-size:14.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--muted);background:var(--panel);
+    border:2px solid var(--edge);
+    box-shadow:0 0 0 1px var(--hair),3px 3px 0 rgba(0,0,0,.45);
+    padding:11px 18px 10px;transform:skewX(-8deg);transition:all .13s ease;
+  }
+  .tab > span{display:inline-block;transform:skewX(8deg)}
+  .tab:hover{color:var(--text)}
+  .tab.active{
+    color:var(--edge);background:var(--yellow);
+    box-shadow:0 0 0 1px var(--edge),4px 4px 0 rgba(0,0,0,.5),0 0 20px rgba(30,90,255,.5);
+    transform:skewX(-8deg) translateY(-2px);
+  }
+  .stage{display:none}
+  .stage.active{display:block;animation:slam .24s ease}
+  @keyframes slam{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:none}}
+
+  .duo{display:grid;grid-template-columns:1.35fr .65fr;gap:16px;align-items:start}
+  .card{
+    background:var(--panel);border:2px solid var(--edge);
+    box-shadow:0 0 0 1px var(--hair),6px 6px 0 rgba(0,0,0,.52);
+    border-radius:8px;overflow:hidden;
+  }
+  .card > .hd{
+    display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+    padding:11px 16px 10px;border-bottom:2px solid var(--edge);background:var(--edge);
+  }
+  .card > .hd .t{
+    font-family:Oswald,sans-serif;font-weight:600;
+    font-size:15.5px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--yellow);text-shadow:0 0 14px rgba(30,90,255,.55);
+  }
+  .card > .hd .k{font-size:12.5px;color:var(--muted);letter-spacing:.16em;text-transform:uppercase}
+  .card > .bd{padding:16px}
+
+  .note{
+    background:var(--panel2);border:1px solid var(--hair);
+    border-left:4px solid var(--yellow);
+    border-radius:4px;padding:11px 14px;color:var(--muted);line-height:1.55;font-weight:400;
+  }
+  .note b{color:var(--text);font-weight:600}
+
+  .feed{
+    font-family:ui-monospace,Consolas,monospace;font-size:13px;
+    background:#010408;
+    border:2px solid var(--edge);
+    box-shadow:inset 0 0 0 1px var(--hair),inset 0 0 12px rgba(0,0,0,.3);
+    border-radius:6px;padding:12px 14px;
+    line-height:1.75;min-height:150px;max-height:220px;overflow:auto;
+    color:#5a7a9a;
+  }
+  .feed .o{color:var(--amber)}
+  .feed .g{color:var(--green)}
+  .feed .r{color:var(--red)}
+  .feed .b{color:var(--blue)}
+  .feed .y{color:var(--yellow)}
+
+  /* map */
+  .map{
+    position:relative;height:430px;border-radius:6px;overflow:hidden;
+    border:2px solid var(--edge);
+    box-shadow:inset 0 0 0 1px var(--hair),inset 0 0 60px rgba(0,0,0,.6);
+    background:
+      repeating-linear-gradient(0deg,transparent 0 46px,rgba(200,210,230,.04) 46px 48px),
+      repeating-linear-gradient(90deg,transparent 0 62px,rgba(200,210,230,.04) 62px 64px),
+      radial-gradient(circle at 66% 24%,#10181f,#070f18 72%);
+  }
+  .map .ave{position:absolute;background:rgba(210,220,240,.06)}
+  .district{
+    position:absolute;font-size:11.5px;font-weight:600;
+    letter-spacing:.26em;text-transform:uppercase;color:rgba(120,160,210,.55);
+  }
+  .call{
+    position:absolute;width:76px;height:76px;
+    transform:translate(-50%,-50%);
+    background:none;border:none;padding:0;cursor:pointer;font-family:inherit;
+  }
+  .call svg{position:absolute;inset:0;overflow:visible}
+  .call .ringbg{fill:none;stroke:rgba(255,255,255,.1);stroke-width:5}
+  .call .ring{
+    fill:none;stroke:var(--yellow);stroke-width:5;stroke-linecap:butt;
+    transform:rotate(-90deg);transform-origin:center;
+    animation:drain 26s linear infinite;
+    filter:drop-shadow(0 0 7px rgba(30,90,255,.8));
+  }
+  @keyframes drain{from{stroke-dashoffset:0}to{stroke-dashoffset:207}}
+  .call .core{
+    position:absolute;inset:17px;border-radius:50%;
+    display:grid;place-items:center;font-size:20px;
+    background:#060a14;border:2px solid var(--edge);
+    box-shadow:0 0 0 1px var(--hair);transition:all .14s ease;
+  }
+  .call:hover .core{box-shadow:0 0 0 2px var(--yellow),0 0 18px rgba(30,90,255,.5)}
+  .call.sel .core{box-shadow:0 0 0 3px var(--yellow),0 0 32px rgba(30,90,255,.75)}
+  .call.done{opacity:.32;pointer-events:none}
+  .call.done .ring{animation:none;stroke:var(--green)}
+  .call .tag{
+    position:absolute;left:50%;top:calc(100% + 2px);
+    transform:translateX(-50%);white-space:nowrap;
+    font-size:11.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--edge);background:var(--yellow);
+    padding:2px 8px 1px;box-shadow:2px 2px 0 var(--edge);
+  }
+
+  /* heroes */
+  .roster{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+  .heroCard{
+    position:relative;background:var(--panel2);border:2px solid var(--edge);
+    box-shadow:0 0 0 1px var(--hair),4px 4px 0 rgba(0,0,0,.52);
+    border-radius:6px;padding:10px 12px 10px 16px;
+    display:flex;gap:10px;align-items:center;cursor:pointer;
+    transform:skewX(-3deg);transition:all .13s ease;overflow:hidden;
+  }
+  .heroCard > *{transform:skewX(3deg)}
+  .heroCard:before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:7px;
+    background:var(--hc,var(--yellow));transform:none;
+  }
+  .heroCard:hover{transform:skewX(-3deg) translateY(-3px)}
+  .heroCard.sel{
+    box-shadow:0 0 0 2px var(--yellow),6px 6px 0 rgba(0,0,0,.5),0 0 24px rgba(30,90,255,.3);
+    background:#0e1c2e;
+  }
+  .heroCard.out{opacity:.38;pointer-events:none}
+  .heroCard .nm{font-family:"Archivo Black",sans-serif;font-size:13.5px;letter-spacing:.05em;text-shadow:2px 2px 0 var(--edge)}
+  .heroCard .rl{font-size:11.5px;font-weight:600;color:var(--muted);letter-spacing:.14em;text-transform:uppercase}
+  .brief .req{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .skillchip{
+    font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+    border:2px solid var(--edge);background:var(--panel2);
+    box-shadow:2px 2px 0 rgba(0,0,0,.42);
+    padding:5px 10px 4px;color:var(--muted);transform:skewX(-6deg);
+  }
+  .skillchip span{display:inline-block;transform:skewX(6deg)}
+  .skillchip b{color:var(--yellow);margin-left:5px}
+  .go{
+    margin-top:16px;width:100%;
+    font-family:"Archivo Black",sans-serif;
+    font-size:15px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--edge);background:var(--yellow);
+    border:2px solid var(--edge);
+    box-shadow:4px 4px 0 rgba(0,0,0,.52),0 0 18px rgba(30,90,255,.3);
+    padding:13px 12px 12px;cursor:pointer;transform:skewX(-4deg);transition:all .13s ease;
+  }
+  .go > span{display:inline-block;transform:skewX(4deg)}
+  .go:hover{filter:brightness(1.1);transform:skewX(-4deg) translateY(-2px);box-shadow:5px 6px 0 rgba(0,0,0,.52),0 0 30px rgba(30,90,255,.52)}
+  .go:disabled{filter:grayscale(1) brightness(.38);cursor:not-allowed;transform:skewX(-4deg)}
+
+  /* hacking */
+  .hackbar{
+    height:16px;background:#010407;
+    border:2px solid var(--edge);box-shadow:inset 0 0 0 1px var(--hair);
+    overflow:hidden;margin-bottom:12px;
+  }
+  .hackbar > div{
+    height:100%;width:100%;
+    background:repeating-linear-gradient(-45deg,var(--orange) 0 10px,var(--amber) 10px 20px);
+    box-shadow:0 0 22px rgba(216,80,16,.75);transition:width .18s linear;
+  }
+  .hackwrapper{position:relative}
+  .hackframe{
+    background:radial-gradient(circle at 50% 0%,rgba(36,120,200,.04),transparent 46%),#03060e;
+    border:2px solid var(--edge);box-shadow:inset 0 0 0 1px var(--hair);
+    border-radius:6px;overflow:hidden;
+  }
+  .hackframe svg{display:block;width:100%;height:auto}
+  .trace{stroke:#162030;stroke-width:5;stroke-linecap:round}
+  .gapline{stroke:var(--orange);stroke-width:4;stroke-dasharray:6 8;stroke-linecap:round}
+  .gapline.built{stroke:var(--blue);stroke-dasharray:none}
+  .nd{fill:#0a1220;stroke:#203040;stroke-width:2}
+  .nd.visited{stroke:#247ac899}
+  .exitHex{
+    fill:rgba(28,184,88,.1);stroke:var(--green);stroke-width:3;
+    filter:drop-shadow(0 0 10px rgba(28,184,88,.65));
+    animation:hexPulse 1.6s ease-in-out infinite;
+  }
+  @keyframes hexPulse{0%,100%{opacity:.82}50%{opacity:1}}
+  .avatar{fill:var(--blue);filter:drop-shadow(0 0 8px rgba(36,120,200,.9));transition:transform .16s ease}
+  .avatar.charged{fill:var(--yellow);filter:drop-shadow(0 0 10px rgba(30,90,255,.95))}
+  .avring{fill:none;stroke:rgba(36,120,200,.38);stroke-width:2;transition:transform .16s ease}
+  .virus{fill:var(--red);filter:drop-shadow(0 0 9px rgba(200,24,24,.85));transition:transform .34s ease}
+  .icoTxt{font-size:15px;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+  .hackfoot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}
+  .dpad{display:grid;grid-template-columns:repeat(3,46px);grid-auto-rows:46px;gap:6px}
+  .dpad button{
+    border:2px solid var(--edge);box-shadow:2px 2px 0 rgba(0,0,0,.5);
+    background:var(--panel2);color:var(--text);font-size:18px;cursor:pointer;transition:all .12s ease;
+  }
+  .dpad button:hover{background:var(--yellow);color:var(--edge)}
+  .dpad button:active{transform:translate(1px,1px);box-shadow:1px 1px 0 rgba(0,0,0,.5)}
+  .dpad .blank{visibility:hidden}
+  .hackstat{display:flex;gap:10px;flex-wrap:wrap}
+  .pill{
+    font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+    border:2px solid var(--edge);background:var(--panel2);
+    box-shadow:2px 2px 0 rgba(0,0,0,.42);
+    padding:6px 11px 5px;color:var(--muted);transform:skewX(-6deg);
+  }
+  .pill span{display:inline-block;transform:skewX(6deg)}
+  .pill.on{color:var(--edge);background:var(--green)}
+  .reset{
+    font-family:Oswald,sans-serif;font-weight:600;
+    font-size:13px;letter-spacing:.16em;text-transform:uppercase;
+    background:var(--panel2);border:2px solid var(--edge);
+    box-shadow:3px 3px 0 rgba(0,0,0,.5);
+    color:var(--muted);padding:11px 16px 10px;cursor:pointer;transition:all .12s ease;
+  }
+  .reset:hover{color:var(--edge);background:var(--yellow)}
+
+  /* hack overlays */
+  .hackover{
+    position:absolute;inset:0;display:none;
+    align-items:center;justify-content:center;
+    background:rgba(2,4,10,.9);border-radius:6px;z-index:5;
+  }
+  .hackover.on{display:flex}
+  .qtebox{
+    text-align:center;background:var(--panel);border:3px solid var(--edge);
+    box-shadow:0 0 0 1px var(--hair),8px 8px 0 rgba(0,0,0,.62);padding:26px 34px;
+  }
+  .qtebox .t{
+    font-family:"Archivo Black",sans-serif;
+    font-size:20px;letter-spacing:.06em;text-transform:uppercase;text-shadow:3px 3px 0 var(--edge);
+  }
+  .qtebox .t .hammer{color:var(--yellow)}
+  .seq{display:flex;gap:10px;justify-content:center;margin:18px 0 6px}
+  .key{
+    width:54px;height:54px;display:grid;place-items:center;font-size:24px;
+    border:2px solid var(--edge);
+    box-shadow:0 0 0 1px var(--hair),3px 3px 0 rgba(0,0,0,.52);
+    background:#060a18;color:var(--muted);transition:all .12s ease;
+  }
+  .key.hit{background:var(--green);color:var(--edge)}
+  .key.now{background:var(--yellow);color:var(--edge);animation:blink .6s ease-in-out infinite}
+  @keyframes blink{50%{box-shadow:0 0 0 1px var(--hair),0 0 22px rgba(30,90,255,.8)}}
+  .qtebox .hint{color:var(--muted);font-size:14px;margin-top:10px;font-weight:400}
+  .bigmsg{text-align:center}
+  .bigmsg .h{
+    font-family:"Archivo Black",sans-serif;
+    font-size:clamp(32px,4.4vw,50px);letter-spacing:.03em;text-transform:uppercase;
+    text-shadow:5px 5px 0 var(--edge);
+  }
+  .bigmsg .h.win{color:var(--green)}
+  .bigmsg .h.lose{color:var(--red)}
+  .bigmsg .s{color:var(--muted);margin-top:10px}
+  .bigmsg button{margin-top:20px}
+
+  /* pentagon */
+  .pentawrap{display:grid;place-items:center;padding:8px 0}
+  .axisLbl{
+    font-family:Oswald,sans-serif;font-weight:600;font-size:13px;
+    letter-spacing:.14em;fill:var(--muted);text-anchor:middle;
+  }
+  .pgrid{fill:none;stroke:#0e1e2e;stroke-width:1}
+  .pReq{fill:rgba(30,90,255,.14);stroke:var(--yellow);stroke-width:2;stroke-dasharray:7 5}
+  .pHero{fill:rgba(36,120,200,.2);stroke:var(--blue);stroke-width:2.5}
+  .legend{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+  .legend .li{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+  .sw{width:22px;height:12px;border:1px solid var(--edge)}
+  .accuracy{text-align:center;margin-top:14px;font-size:13.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .accuracy b{
+    font-family:"Archivo Black",sans-serif;
+    font-size:32px;color:var(--yellow);display:block;margin-top:4px;
+    text-shadow:3px 3px 0 var(--edge),0 0 26px rgba(30,90,255,.55);
+  }
+  .mini-pent{flex-shrink:0}
+  .foot{
+    padding:14px 20px 18px;border-top:3px solid var(--edge);
+    background:#020408;color:#4a6278;
+    font-size:12.5px;letter-spacing:.05em;line-height:1.55;
+  }
+
+  @media (max-width:1080px){
+    .duo{grid-template-columns:1fr}
+    .roster{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="console">
+
+            <div class="masthead">
+              <div>
+                <span class="stamp">SDN // Night Shift Console</span>
+                <h1>Dispatch UI Study <span class="white">V2</span></h1>
+                <div class="sub">Same four minigames, restyled to sit closer to the game's own interface: SDN amber-yellow chrome on slate blue-gray panels, hard black comic outlines with offset shadows, skewed badges, and a scanlined dispatch monitor.</div>
+                <div class="verlinks"><b>V2 — SDN palette</b><a href="index.html">← switch to V1 (orange console)</a></div>
+              </div>
+              <div class="shiftcard">
+                <div class="lbl">Shift Clock</div>
+                <div class="t" id="shiftClock">23:41</div>
+              </div>
+            </div>
+
+            <div class="deck">
+              <div class="tabs" role="tablist" aria-label="Minigames">
+                <button class="tab active" data-tab="map"><span>Dispatch Map</span></button>
+                <button class="tab" data-tab="hack"><span>Hacking</span></button>
+                <button class="tab" data-tab="qte"><span>Bridge QTE</span></button>
+                <button class="tab" data-tab="report"><span>Skill Report</span></button>
+              </div>
+
+              <!-- DISPATCH MAP -->
+              <section class="stage active" id="map">
+                <div class="duo">
+                  <div class="card">
+                    <div class="hd"><div class="t">City Grid — Los Angeles</div><div class="k" id="mapStatus">3 open calls</div></div>
+                    <div class="bd">
+                      <div class="map" id="cityMap">
+                        <div class="ave" style="left:0;right:0;top:31%;height:3px"></div>
+                        <div class="ave" style="left:0;right:0;top:64%;height:3px"></div>
+                        <div class="ave" style="top:0;bottom:0;left:24%;width:3px"></div>
+                        <div class="ave" style="top:0;bottom:0;left:55%;width:3px;transform:skewX(-14deg)"></div>
+                        <div class="ave" style="top:0;bottom:0;left:80%;width:3px"></div>
+                        <div class="district" style="left:6%;top:8%">Echo Park</div>
+                        <div class="district" style="left:60%;top:12%">Downtown</div>
+                        <div class="district" style="left:84%;top:44%">Boyle Hts</div>
+                        <div class="district" style="left:8%;top:82%">Harbor</div>
+                        <div class="district" style="left:60%;top:84%">Vernon</div>
+                      </div>
+                      <div class="roster" id="roster"></div>
+                    </div>
+                  </div>
+                  <div class="card brief">
+                    <div class="hd"><div class="t">Call Briefing</div><div class="k">time paused</div></div>
+                    <div class="bd">
+                      <div class="note" id="briefText"><b>No call selected.</b> Click a pulsing incident ring on the map. Time pauses while you read the briefing — but the ring keeps its countdown when you close it.</div>
+                      <div class="req" id="briefReq"></div>
+                      <button class="go" id="sendBtn" disabled><span>Dispatch Hero</span></button>
+                      <div style="height:14px"></div>
+                      <div class="feed" id="mapFeed">
+                        <div><span class="y">&gt; SDN uplink</span> established</div>
+                        <div><span class="b">&gt; roster</span> 4 heroes on shift</div>
+                        <div>&gt; awaiting call selection…</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- HACKING -->
+              <section class="stage" id="hack">
+                <div class="duo">
+                  <div class="card">
+                    <div class="hd"><div class="t">Breach — Node Maze</div><div class="k">arrow keys / d-pad</div></div>
+                    <div class="bd">
+                      <div class="hackbar"><div id="hackFill"></div></div>
+                      <div class="hackwrapper">
+                        <div class="hackframe"><svg id="hackSvg" viewBox="0 0 780 440" role="img" aria-label="Hacking node maze"></svg></div>
+                        <div class="hackover" id="bridgeOver">
+                          <div class="qtebox">
+                            <div class="t"><span class="hammer">⚒</span> Build Bridge</div>
+                            <div class="seq" id="bridgeSeq"></div>
+                            <div class="hint">Tap the arrow sequence. A wrong key resets the pattern.</div>
+                          </div>
+                        </div>
+                        <div class="hackover" id="endOver">
+                          <div class="bigmsg">
+                            <div class="h win" id="endH">Access Granted</div>
+                            <div class="s" id="endS">Node breached with 0:31 on the trace.</div>
+                            <button class="go" style="width:auto;padding:12px 26px 11px" onclick="hackReset()"><span>Run It Again</span></button>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="hackfoot">
+                        <div class="dpad">
+                          <span class="blank"></span><button onclick="hackMove(0,-1)" aria-label="Up">↑</button><span class="blank"></span>
+                          <button onclick="hackMove(-1,0)" aria-label="Left">←</button><button onclick="hackMove(0,1)" aria-label="Down">↓</button><button onclick="hackMove(1,0)" aria-label="Right">→</button>
+                        </div>
+                        <div class="hackstat">
+                          <span class="pill" id="pillPass"><span>🔑 password</span></span>
+                          <span class="pill" id="pillCharge"><span>⚡ charge</span></span>
+                          <span class="pill" id="pillBridge"><span>⚒ bridge</span></span>
+                        </div>
+                        <button class="reset" onclick="hackReset()">Reset Run</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="card">
+                    <div class="hd"><div class="t">Field Notes</div><div class="k">how it works</div></div>
+                    <div class="bd" style="display:grid;gap:12px">
+                      <div class="note"><b style="color:var(--green)">⬡ Green hexagon</b> is the exit. Reach it before the orange trace bar drains.</div>
+                      <div class="note"><b style="color:var(--amber)">⚒ Hammer gap</b> — step into it to trigger a bridge QTE: tap the shown arrow sequence to span the gap.</div>
+                      <div class="note"><b style="color:var(--red)">◆ Antivirus</b> patrols the far zone and steps every time you do. Contact kicks you back to entry and burns trace time.</div>
+                      <div class="note"><b style="color:var(--yellow)">⚡ Battery</b> charges your avatar; carry it into the dead <b>▣ gate</b> to power it. <b style="color:var(--red)">🔒 Lock</b> opens only after you touch the <b>PW</b> node.</div>
+                      <div class="feed" id="hackFeed">
+                        <div><span class="b">&gt; avatar</span> injected at entry node</div>
+                        <div>&gt; two routes to the exit — pick your poison</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- BRIDGE QTE -->
+              <section class="stage" id="qte">
+                <div class="duo">
+                  <div class="card">
+                    <div class="hd"><div class="t">QTE Trainer</div><div class="k">arrow keys</div></div>
+                    <div class="bd" style="text-align:center;padding:34px 16px">
+                      <div class="qtebox" style="display:inline-block">
+                        <div class="t"><span class="hammer">⚒</span> Sequence <span id="qteRound" style="color:var(--yellow)">01</span></div>
+                        <div class="seq" id="qteSeq"></div>
+                        <div class="hint" id="qteHint">Press START, then tap the arrows in order before the pattern resets you.</div>
+                      </div>
+                      <div style="height:22px"></div>
+                      <button class="go" style="width:auto;padding:13px 34px 12px" id="qteStart"><span>Start</span></button>
+                    </div>
+                  </div>
+                  <div class="card">
+                    <div class="hd"><div class="t">Streak</div><div class="k">no misses</div></div>
+                    <div class="bd" style="display:grid;gap:12px">
+                      <div class="accuracy">Current streak<b id="qteStreak">0</b></div>
+                      <div class="accuracy">Best<b id="qteBest" style="color:var(--green)">0</b></div>
+                      <div class="note">In-game, these direction taps fire during hacking gaps and cinematic beats. The prompt should read instantly: big glyph, yellow focus state, hard reset on a miss.</div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- SKILL REPORT -->
+              <section class="stage" id="report">
+                <div class="duo">
+                  <div class="card">
+                    <div class="hd"><div class="t">Post-Call Skill Pentagon</div><div class="k" id="reportWho">sample data</div></div>
+                    <div class="bd">
+                      <div class="pentawrap">
+                        <svg id="pentSvg" width="420" height="380" viewBox="0 0 420 380"></svg>
+                      </div>
+                      <div class="legend">
+                        <div class="li"><span class="sw" style="background:rgba(30,90,255,.44);outline:2px dashed var(--yellow)"></span>Call required</div>
+                        <div class="li"><span class="sw" style="background:rgba(36,120,200,.5)"></span>Hero delivered</div>
+                      </div>
+                      <div class="accuracy">Dispatch accuracy<b id="accVal">—</b></div>
+                    </div>
+                  </div>
+                  <div class="card">
+                    <div class="hd"><div class="t">Reading It</div><div class="k">com·vig·mob·cha·int</div></div>
+                    <div class="bd" style="display:grid;gap:12px">
+                      <div class="note">After every resolved call the five skills — <b>Combat, Vigour, Mobility, Charisma, Intellect</b> — plot as a pentagon. The dashed yellow shape is what the call demanded; the filled blue shape is what your hero brought.</div>
+                      <div class="note">Blue spilling past yellow = wasted muscle. Yellow poking out past blue = the deficit that made the call go sideways. Send someone from the <b>Dispatch Map</b> tab and this chart updates with the real match-up.</div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <div class="foot">
+              Fan-made UI study inspired by the minigames in <b>Dispatch</b> (AdHoc Studio, 2025). Recreated from scratch for design reference — not affiliated with or endorsed by AdHoc Studio; no original game assets, art, or text are used.
+            </div>
+
+  </div><!-- .console -->
+</div><!-- .wrap -->
+
+<script>
+/* ---------- tabs ---------- */
+const tabs = document.querySelectorAll('.tab');
+const stages = document.querySelectorAll('.stage');
+let activeTab = 'map';
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    stages.forEach(s => s.classList.remove('active'));
+    tab.classList.add('active');
+    activeTab = tab.dataset.tab;
+    document.getElementById(activeTab).classList.add('active');
+  });
+});
+
+/* ---------- shift clock ---------- */
+(function(){
+  let m = 23, s = 41;
+  setInterval(() => {
+    s++; if (s > 59){ s = 0; m = (m + 1) % 24; }
+    document.getElementById('shiftClock').textContent =
+      String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  }, 1000);
+})();
+
+/* ---------- shared: pentagon helpers ---------- */
+const SKILLS = ['combat','vigour','mobility','charisma','intellect'];
+const SKILL_ABBR = ['COM','VIG','MOB','CHA','INT'];
+function pentPoints(cx, cy, r, stats){
+  return SKILLS.map((k,i) => {
+    const a = -Math.PI/2 + i * (Math.PI*2/5);
+    const rr = r * (stats[k]/10);
+    return (cx + rr*Math.cos(a)).toFixed(1) + ',' + (cy + rr*Math.sin(a)).toFixed(1);
+  }).join(' ');
+}
+function fullPent(cx, cy, r){
+  return pentPoints(cx, cy, r, {combat:10,vigour:10,mobility:10,charisma:10,intellect:10});
+}
+function miniPent(stats, color){
+  const s = 54, c = s/2, r = 22;
+  return `<svg class="mini-pent" width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">
+    <polygon points="${fullPent(c,c,r)}" fill="none" stroke="#39415a" stroke-width="1"/>
+    <polygon points="${pentPoints(c,c,r,stats)}" fill="${color}44" stroke="${color}" stroke-width="1.6"/>
+  </svg>`;
+}
+
+/* ---------- dispatch map ---------- */
+const heroes = [
+  { name:'SLEDGE',  role:'Wrecker', color:'#f5a623', stats:{combat:9,vigour:8,mobility:2,charisma:2,intellect:3} },
+  { name:'WISP',    role:'Runner',  color:'#3fa9ff', stats:{combat:3,vigour:4,mobility:9,charisma:4,intellect:5} },
+  { name:'HALO',    role:'Face',    color:'#ffc233', stats:{combat:2,vigour:3,mobility:4,charisma:9,intellect:6} },
+  { name:'CIRCUIT', role:'Analyst', color:'#3ddc78', stats:{combat:4,vigour:5,mobility:5,charisma:3,intellect:9} },
+];
+const calls = [
+  { id:'c1', icon:'🚨', name:'Armored truck heist', dist:'Downtown', x:63, y:36,
+    brief:'Two supers cracking a transport open on 5th. Needs someone who hits like a demolition permit.',
+    req:{combat:8,vigour:6,mobility:4,charisma:1,intellect:2} },
+  { id:'c2', icon:'🔥', name:'Chemical fire', dist:'Harbor', x:27, y:72,
+    brief:'Storage tank venting something green. Needs endurance and enough brains not to breathe it.',
+    req:{combat:2,vigour:8,mobility:6,charisma:1,intellect:5} },
+  { id:'c3', icon:'🗣️', name:'Rooftop standoff', dist:'Echo Park', x:38, y:20,
+    brief:'A scared kid with borrowed powers on a ledge. Send a voice, not a fist.',
+    req:{combat:1,vigour:2,mobility:5,charisma:9,intellect:3} },
+];
+let selCall = null, selHero = null, openCalls = calls.length;
+
+const mapEl = document.getElementById('cityMap');
+calls.forEach(c => {
+  const b = document.createElement('button');
+  b.className = 'call'; b.id = 'call_' + c.id;
+  b.innerHTML = `
+    <svg viewBox="0 0 76 76">
+      <circle class="ringbg" cx="38" cy="38" r="33"/>
+      <circle class="ring" cx="38" cy="38" r="33" stroke-dasharray="207" stroke-dashoffset="0"/>
+    </svg>
+    <span class="core">${c.icon}</span>
+    <span class="tag">${c.dist}</span>`;
+  b.style.left = c.x + '%';
+  b.style.top = c.y + '%';
+  b.addEventListener('click', () => selectCall(c));
+  mapEl.appendChild(b);
+});
+
+const rosterEl = document.getElementById('roster');
+heroes.forEach(h => {
+  const d = document.createElement('div');
+  d.className = 'heroCard'; d.id = 'hero_' + h.name;
+  d.style.setProperty('--hc', h.color);
+  d.innerHTML = miniPent(h.stats, h.color) +
+    `<div><div class="nm" style="color:${h.color}">${h.name}</div><div class="rl">${h.role}</div></div>`;
+  d.addEventListener('click', () => selectHero(h));
+  rosterEl.appendChild(d);
+});
+
+function selectCall(c){
+  selCall = c;
+  document.querySelectorAll('.call').forEach(el => el.classList.remove('sel'));
+  document.getElementById('call_' + c.id).classList.add('sel');
+  document.getElementById('briefText').innerHTML = `<b>${c.name} — ${c.dist}.</b> ${c.brief}`;
+  document.getElementById('briefReq').innerHTML = SKILLS.map((k,i) =>
+    `<span class="skillchip"><span>${SKILL_ABBR[i]}<b>${c.req[k]}</b></span></span>`).join('');
+  syncSend();
+}
+function selectHero(h){
+  selHero = h;
+  document.querySelectorAll('.heroCard').forEach(el => el.classList.remove('sel'));
+  document.getElementById('hero_' + h.name).classList.add('sel');
+  syncSend();
+}
+function syncSend(){
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = !(selCall && selHero);
+  btn.querySelector('span').textContent = (selCall && selHero) ? `Dispatch ${selHero.name}` : 'Dispatch Hero';
+}
+document.getElementById('sendBtn').addEventListener('click', () => {
+  if (!selCall || !selHero) return;
+  const deficit = SKILLS.reduce((t,k) => t + Math.max(0, selCall.req[k] - selHero.stats[k]), 0);
+  const acc = Math.max(4, Math.min(99, 100 - deficit * 9));
+  const verdict = acc >= 72 ? ['g','RESOLVED'] : acc >= 45 ? ['y','MESSY SAVE'] : ['r','CALL FAILED'];
+  mapLog(`<span class="b">&gt; ${selHero.name}</span> dispatched to <span class="y">${selCall.name}</span>`);
+  mapLog(`<span class="${verdict[0]}">&gt; ${verdict[1]}</span> — accuracy ${acc}%`);
+  document.getElementById('call_' + selCall.id).classList.add('done');
+  document.getElementById('call_' + selCall.id).classList.remove('sel');
+  const heroCard = document.getElementById('hero_' + selHero.name);
+  heroCard.classList.add('out'); heroCard.classList.remove('sel');
+  setTimeout(((h) => () => h.classList.remove('out'))(heroCard), 9000);
+  openCalls--;
+  document.getElementById('mapStatus').textContent =
+    openCalls > 0 ? openCalls + ' open call' + (openCalls > 1 ? 's' : '') : 'district quiet';
+  renderReport(selCall, selHero, acc);
+  document.getElementById('briefText').innerHTML =
+    `<b>Unit en route.</b> Outcome plotted on the <b>Skill Report</b> tab. ${openCalls > 0 ? 'Pick the next call.' : 'Shift board is clear.'}`;
+  document.getElementById('briefReq').innerHTML = '';
+  selCall = null; selHero = null;
+  syncSend();
+});
+function mapLog(html){
+  const f = document.getElementById('mapFeed');
+  f.insertAdjacentHTML('afterbegin', `<div>${html}</div>`);
+}
+
+/* ---------- skill report ---------- */
+function renderReport(call, hero, acc){
+  const svg = document.getElementById('pentSvg');
+  const cx = 210, cy = 196, R = 138;
+  let rings = '';
+  for (let i = 1; i <= 4; i++){
+    rings += `<polygon class="pgrid" points="${fullPent(cx,cy,R*i/4)}"/>`;
+  }
+  let spokes = '', labels = '';
+  SKILLS.forEach((k,i) => {
+    const a = -Math.PI/2 + i * (Math.PI*2/5);
+    const x = cx + R*Math.cos(a), y = cy + R*Math.sin(a);
+    spokes += `<line class="pgrid" x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"/>`;
+    const lx = cx + (R+26)*Math.cos(a), ly = cy + (R+26)*Math.sin(a);
+    labels += `<text class="axisLbl" x="${lx.toFixed(1)}" y="${(ly+4).toFixed(1)}">${SKILL_ABBR[i]}</text>`;
+  });
+  svg.innerHTML = rings + spokes +
+    `<polygon class="pReq" points="${pentPoints(cx,cy,R,call.req)}"/>` +
+    `<polygon class="pHero" points="${pentPoints(cx,cy,R,hero.stats)}"/>` + labels;
+  document.getElementById('reportWho').textContent = hero.name + ' → ' + call.name;
+  document.getElementById('accVal').textContent = acc + '%';
+}
+renderReport(calls[0], heroes[0], 87);
+
+/* ---------- hacking minigame ---------- */
+const NX = c => 54 + c * 96;
+const NY = r => 52 + r * 84;
+const START = '0,2', EXIT = '7,2';
+const PASS_NODE = '0,0', LOCK_NODE = '5,1', BATT_NODE = '0,4', GATE_NODE = '5,3';
+const GAP_EDGE = key('3,2','4,2');
+const EDGES = [
+  ['0,2','0,1'],['0,1','1,1'],['1,1','1,0'],['1,0','0,0'],['1,0','2,0'],['2,0','3,0'],
+  ['3,0','3,1'],['3,1','2,1'],['2,1','2,2'],['0,2','1,2'],['1,2','2,2'],['2,2','3,2'],
+  ['1,2','1,3'],['1,3','1,4'],['1,4','0,4'],['1,4','2,4'],['2,4','2,3'],['2,3','3,3'],['3,3','3,2'],
+  ['3,2','4,2'],
+  ['4,2','4,1'],['4,1','5,1'],['5,1','6,1'],['6,1','6,2'],['6,2','7,2'],
+  ['4,2','4,3'],['4,3','5,3'],['5,3','6,3'],['6,3','6,2'],
+];
+const PATROL = ['4,1','5,1','6,1','6,2','6,3','5,3','4,3','4,2'];
+function key(a, b){ return [a,b].sort().join('|'); }
+const edgeSet = new Set(EDGES.map(e => key(e[0], e[1])));
+const nodeIds = [...new Set(EDGES.flat())];
+
+let H;
+const svgEl = document.getElementById('hackSvg');
+const hackFill = document.getElementById('hackFill');
+let hackTimerId = null;
+
+function hexPts(cx, cy, r){
+  let p = [];
+  for (let i = 0; i < 6; i++){
+    const a = Math.PI/6 + i*Math.PI/3;
+    p.push((cx + r*Math.cos(a)).toFixed(1) + ',' + (cy + r*Math.sin(a)).toFixed(1));
+  }
+  return p.join(' ');
+}
+function pos(id){ const [c,r] = id.split(',').map(Number); return [NX(c), NY(r)]; }
+
+function buildHackSvg(){
+  let s = '';
+  edgeSet.forEach(k => {
+    const [a,b] = k.split('|');
+    const [x1,y1] = pos(a), [x2,y2] = pos(b);
+    if (k === GAP_EDGE){
+      s += `<line id="gapLine" class="gapline" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+      s += `<text id="gapIcon" class="icoTxt" x="${(x1+x2)/2}" y="${(y1+y2)/2 - 14}" fill="#ffc233">⚒</text>`;
+    } else {
+      s += `<line class="trace" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+    }
+  });
+  nodeIds.forEach(id => {
+    const [x,y] = pos(id);
+    if (id === EXIT){
+      s += `<polygon class="exitHex" points="${hexPts(x,y,20)}"/>`;
+      s += `<text class="icoTxt" x="${x}" y="${y}" fill="#3ddc78" style="font-size:11px">EXIT</text>`;
+    } else {
+      s += `<circle class="nd" id="nd_${id.replace(',','_')}" cx="${x}" cy="${y}" r="11"/>`;
+    }
+  });
+  const put = (id, glyph, fill, extra) => {
+    const [x,y] = pos(id);
+    return `<text id="${extra}" class="icoTxt" x="${x}" y="${y-20}" fill="${fill}">${glyph}</text>`;
+  };
+  s += put(PASS_NODE, 'PW', '#ffc233', 'icoPass');
+  s += put(LOCK_NODE, '🔒', '#ff4757', 'icoLock');
+  s += put(BATT_NODE, '⚡', '#ffc233', 'icoBatt');
+  s += put(GATE_NODE, '▣', '#8f97a8', 'icoGate');
+  const [sx,sy] = pos(START);
+  s += `<text class="icoTxt" x="${sx}" y="${sy+26}" fill="#8f97a8" style="font-size:10px;letter-spacing:2px">ENTRY</text>`;
+  s += `<polygon id="virus" class="virus" points="0,-11 11,0 0,11 -11,0"/>`;
+  s += `<circle id="avRing" class="avring" r="15"/>`;
+  s += `<circle id="avatar" class="avatar" r="9"/>`;
+  svgEl.innerHTML = s;
+}
+buildHackSvg();
+
+function hackReset(){
+  H = {
+    at: START, started: false, over: false,
+    t: 90, max: 90,
+    bridge: false, pass: false, charge: false, gate: false,
+    avIdx: 0, visited: new Set([START]),
+  };
+  clearInterval(hackTimerId); hackTimerId = null;
+  document.getElementById('bridgeOver').classList.remove('on');
+  document.getElementById('endOver').classList.remove('on');
+  document.getElementById('gapLine').classList.remove('built');
+  document.getElementById('gapIcon').textContent = '⚒';
+  document.getElementById('icoLock').textContent = '🔒';
+  document.getElementById('icoGate').setAttribute('fill', '#8f97a8');
+  document.getElementById('avatar').classList.remove('charged');
+  nodeIds.forEach(id => {
+    const el = document.getElementById('nd_' + id.replace(',','_'));
+    if (el) el.classList.remove('visited');
+  });
+  ['pillPass','pillCharge','pillBridge'].forEach(id => document.getElementById(id).classList.remove('on'));
+  hackFill.style.width = '100%';
+  placeActor('avatar', H.at); placeActor('avRing', H.at);
+  placeActor('virus', PATROL[0]);
+  hackLog('<span class="b">&gt; run reset</span> — avatar at entry');
+}
+function placeActor(id, node){
+  const [x,y] = pos(node);
+  document.getElementById(id).setAttribute('transform', `translate(${x},${y})`);
+}
+function hackLog(html){
+  const f = document.getElementById('hackFeed');
+  f.insertAdjacentHTML('afterbegin', `<div>${html}</div>`);
+}
+function startClock(){
+  if (hackTimerId) return;
+  H.started = true;
+  hackTimerId = setInterval(() => {
+    if (H.over) return;
+    H.t -= 0.2;
+    hackFill.style.width = Math.max(0, H.t / H.max * 100) + '%';
+    if (H.t <= 0) hackEnd(false, 'The trace caught up. Orange bar hit zero.');
+  }, 200);
+}
+function hackEnd(win, msg){
+  H.over = true;
+  clearInterval(hackTimerId); hackTimerId = null;
+  const h = document.getElementById('endH');
+  h.textContent = win ? 'Access Granted' : 'Trace Locked';
+  h.className = 'h ' + (win ? 'win' : 'lose');
+  document.getElementById('endS').textContent = msg;
+  document.getElementById('endOver').classList.add('on');
+  hackLog(win ? '<span class="g">&gt; ACCESS GRANTED</span>' : '<span class="r">&gt; TRACE LOCKED — run failed</span>');
+}
+
+let bridgeState = null;
+function openBridgeQte(){
+  const arrows = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
+  const seq = Array.from({length:4}, () => arrows[Math.floor(Math.random()*4)]);
+  bridgeState = { seq, i: 0 };
+  drawBridgeSeq();
+  document.getElementById('bridgeOver').classList.add('on');
+}
+const ARROW_GLYPH = { ArrowUp:'↑', ArrowDown:'↓', ArrowLeft:'←', ArrowRight:'→' };
+function drawBridgeSeq(){
+  document.getElementById('bridgeSeq').innerHTML = bridgeState.seq.map((k,i) =>
+    `<span class="key ${i < bridgeState.i ? 'hit' : i === bridgeState.i ? 'now' : ''}">${ARROW_GLYPH[k]}</span>`
+  ).join('');
+}
+function bridgeKey(k){
+  if (!bridgeState) return;
+  if (k === bridgeState.seq[bridgeState.i]){
+    bridgeState.i++;
+    if (bridgeState.i >= bridgeState.seq.length){
+      H.bridge = true;
+      bridgeState = null;
+      document.getElementById('bridgeOver').classList.remove('on');
+      document.getElementById('gapLine').classList.add('built');
+      document.getElementById('gapIcon').textContent = '';
+      document.getElementById('pillBridge').classList.add('on');
+      hackLog('<span class="g">&gt; bridge built</span> — gap spanned');
+      doMoveTo('4,2');
+      return;
+    }
+  } else {
+    bridgeState.i = 0;
+  }
+  drawBridgeSeq();
+}
+
+function hackMove(dc, dr){
+  if (!H || H.over || bridgeState) return;
+  const [c,r] = H.at.split(',').map(Number);
+  const target = (c+dc) + ',' + (r+dr);
+  const k = key(H.at, target);
+  if (!edgeSet.has(k)) return;
+  startClock();
+  if (k === GAP_EDGE && !H.bridge){ openBridgeQte(); return; }
+  if (target === LOCK_NODE && !H.pass){
+    hackLog('<span class="r">&gt; 🔒 locked</span> — find the PW node first');
+    return;
+  }
+  if (target === GATE_NODE && !H.gate && !H.charge){
+    hackLog('<span class="r">&gt; ▣ gate is dead</span> — bring the ⚡ charge');
+    return;
+  }
+  doMoveTo(target);
+}
+function doMoveTo(target){
+  H.at = target;
+  H.visited.add(target);
+  const nd = document.getElementById('nd_' + target.replace(',','_'));
+  if (nd) nd.classList.add('visited');
+  placeActor('avatar', target); placeActor('avRing', target);
+
+  if (target === PASS_NODE && !H.pass){
+    H.pass = true;
+    document.getElementById('icoLock').textContent = '🔓';
+    document.getElementById('pillPass').classList.add('on');
+    hackLog('<span class="y">&gt; password lifted</span> — 🔒 is now open');
+  }
+  if (target === BATT_NODE && !H.charge && !H.gate){
+    H.charge = true;
+    document.getElementById('avatar').classList.add('charged');
+    document.getElementById('pillCharge').classList.add('on');
+    hackLog('<span class="y">&gt; ⚡ charge acquired</span> — avatar is hot');
+  }
+  if (target === GATE_NODE && H.charge){
+    H.charge = false; H.gate = true;
+    document.getElementById('avatar').classList.remove('charged');
+    document.getElementById('icoGate').setAttribute('fill', '#3ddc78');
+    hackLog('<span class="g">&gt; gate powered</span> — route open');
+  }
+  if (target === EXIT){
+    const left = Math.max(0, H.t);
+    hackEnd(true, `Node breached with ${Math.floor(left/60)}:${String(Math.floor(left%60)).padStart(2,'0')} on the trace.`);
+    return;
+  }
+  virusStep();
+}
+function virusStep(){
+  H.avIdx = (H.avIdx + 1) % PATROL.length;
+  const vAt = PATROL[H.avIdx];
+  placeActor('virus', vAt);
+  if (vAt === H.at){
+    H.t = Math.max(1, H.t - 10);
+    hackFill.style.width = (H.t / H.max * 100) + '%';
+    H.at = START;
+    placeActor('avatar', START); placeActor('avRing', START);
+    if (H.charge){
+      H.charge = false;
+      document.getElementById('avatar').classList.remove('charged');
+      document.getElementById('pillCharge').classList.remove('on');
+    }
+    hackLog('<span class="r">&gt; ◆ antivirus contact</span> — dumped to entry, −10s');
+  }
+}
+hackReset();
+
+/* ---------- QTE trainer ---------- */
+let trainer = null, qteBest = 0;
+document.getElementById('qteStart').addEventListener('click', startTrainer);
+function startTrainer(){
+  trainer = { seq: [], i: 0, round: 0, streak: 0 };
+  nextTrainerSeq();
+  document.getElementById('qteHint').textContent = 'Go! Wrong key resets the pattern and your streak.';
+}
+function nextTrainerSeq(){
+  const arrows = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
+  trainer.round++;
+  trainer.i = 0;
+  const len = Math.min(3 + Math.floor(trainer.round / 2), 7);
+  trainer.seq = Array.from({length: len}, () => arrows[Math.floor(Math.random()*4)]);
+  document.getElementById('qteRound').textContent = String(trainer.round).padStart(2,'0');
+  drawTrainer();
+}
+function drawTrainer(){
+  document.getElementById('qteSeq').innerHTML = trainer.seq.map((k,i) =>
+    `<span class="key ${i < trainer.i ? 'hit' : i === trainer.i ? 'now' : ''}">${ARROW_GLYPH[k]}</span>`
+  ).join('');
+}
+function trainerKey(k){
+  if (!trainer) return;
+  if (k === trainer.seq[trainer.i]){
+    trainer.i++;
+    if (trainer.i >= trainer.seq.length){
+      trainer.streak++;
+      qteBest = Math.max(qteBest, trainer.streak);
+      document.getElementById('qteStreak').textContent = trainer.streak;
+      document.getElementById('qteBest').textContent = qteBest;
+      nextTrainerSeq();
+      return;
+    }
+  } else {
+    trainer.i = 0;
+    trainer.streak = 0;
+    document.getElementById('qteStreak').textContent = '0';
+  }
+  drawTrainer();
+}
+
+/* ---------- global keys ---------- */
+const DIRS = { ArrowUp:[0,-1], ArrowDown:[0,1], ArrowLeft:[-1,0], ArrowRight:[1,0] };
+document.addEventListener('keydown', e => {
+  if (!(e.key in DIRS)) return;
+  if (bridgeState){ e.preventDefault(); bridgeKey(e.key); return; }
+  if (activeTab === 'hack'){ e.preventDefault(); const [dc,dr] = DIRS[e.key]; hackMove(dc,dr); return; }
+  if (activeTab === 'qte' && trainer){ e.preventDefault(); trainerKey(e.key); }
+});
+</script>
+</body>
+</html>
