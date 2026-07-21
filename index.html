@@ -413,38 +413,38 @@
                   <div class="name">Aster</div>
                   <div class="sub">Speed / Rescue / Improvisation</div>
                   <div class="traits"><span class="chip">Fast</span><span class="chip">Bright</span><span class="chip">Risky</span></div>
-                  <div class="dropzone" ondragover="event.preventDefault()" ondrop="dropTo(event,this)">Drop mission here</div>
+                  <div class="dropzone">Drop mission here</div>
                 </div>
                 <div class="slot hero">
                   <div class="portrait">B</div>
                   <div class="name">Bolt</div>
                   <div class="sub">Power / Shield / Crowd Control</div>
                   <div class="traits"><span class="chip">Strong</span><span class="chip">Steady</span><span class="chip">Loud</span></div>
-                  <div class="dropzone" ondragover="event.preventDefault()" ondrop="dropTo(event,this)">Drop mission here</div>
+                  <div class="dropzone">Drop mission here</div>
                 </div>
                 <div class="slot hero">
                   <div class="portrait">M</div>
                   <div class="name">Mira</div>
                   <div class="sub">Tech / Scan / Clean-up</div>
                   <div class="traits"><span class="chip">Smart</span><span class="chip">Precise</span><span class="chip">Calm</span></div>
-                  <div class="dropzone" ondragover="event.preventDefault()" ondrop="dropTo(event,this)">Drop mission here</div>
+                  <div class="dropzone">Drop mission here</div>
                 </div>
               </div>
 
               <div style="height:14px"></div>
 
               <div class="board">
-                <div class="slot mission" draggable="true" ondragstart="drag(event)" data-task="Fire at harbor" data-type="emergency">
+                <div class="slot mission" draggable="true" data-task="Fire at harbor" data-type="emergency">
                   <div class="name">Fire at harbor</div>
                   <div class="subt">Civilians trapped, time limit 02:00, heat hazard high.</div>
                   <div class="meta"><span>Emergency</span><span>+30 reward</span></div>
                 </div>
-                <div class="slot delivery" draggable="true" ondragstart="drag(event)" data-task="Replace power cells" data-type="delivery">
+                <div class="slot delivery" draggable="true" data-task="Replace power cells" data-type="delivery">
                   <div class="name">Replace power cells</div>
                   <div class="subt">Routine delivery to downtown grid. Needs accuracy, not brute force.</div>
                   <div class="meta"><span>Delivery</span><span>+12 reward</span></div>
                 </div>
-                <div class="slot mission" draggable="true" ondragstart="drag(event)" data-task="Cat rescue on roof" data-type="chore">
+                <div class="slot mission" draggable="true" data-task="Cat rescue on roof" data-type="chore">
                   <div class="name">Cat rescue on roof</div>
                   <div class="subt">Low threat, high public visibility, must keep morale up.</div>
                   <div class="meta"><span>Chore</span><span>+5 reward</span></div>
@@ -667,27 +667,105 @@
 <script>
 const tabs = document.querySelectorAll('.tab');
 const stages = document.querySelectorAll('.stage');
+const missionCards = document.querySelectorAll('.slot[draggable="true"]');
+const dropZones = document.querySelectorAll('.dropzone');
+const state = {
+  assignments: {},
+  risk: 67,
+  morale: 42,
+  power: 8
+};
 
-tabs.forEach(tab=>{
-  tab.addEventListener('click',()=>{
-    tabs.forEach(t=>t.classList.remove('active'));
-    stages.forEach(s=>s.classList.remove('active'));
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
+    stages.forEach(s => s.classList.remove('active'));
     tab.classList.add('active');
     document.getElementById(tab.dataset.tab).classList.add('active');
   });
 });
 
-function drag(ev){
-  ev.dataTransfer.setData("text/plain", ev.target.dataset.task || ev.target.querySelector('.name')?.textContent || '');
-}
-function dropTo(ev, zone){
-  ev.preventDefault();
-  const task = ev.dataTransfer.getData("text/plain");
-  if(task){
-    zone.textContent = "Assigned: " + task;
+missionCards.forEach(card => {
+  card.addEventListener('dragstart', e => {
+    e.dataTransfer.setData('text/plain', card.dataset.task);
+    e.dataTransfer.effectAllowed = 'move';
+    card.classList.add('dragging');
+  });
+
+  card.addEventListener('dragend', () => {
+    card.classList.remove('dragging');
+  });
+});
+
+dropZones.forEach(zone => {
+  zone.addEventListener('dragover', e => {
+    e.preventDefault();
     zone.classList.add('dragover');
-    setTimeout(()=>zone.classList.remove('dragover'), 500);
+    e.dataTransfer.dropEffect = 'move';
+  });
+
+  zone.addEventListener('dragleave', () => {
+    zone.classList.remove('dragover');
+  });
+
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+
+    const task = e.dataTransfer.getData('text/plain');
+    if (!task) return;
+
+    const heroCard = zone.closest('.slot.hero');
+    const heroName = heroCard?.querySelector('.name')?.textContent || 'Hero';
+
+    zone.textContent = `Assigned: ${task}`;
+    zone.style.fontWeight = '700';
+    zone.style.color = 'var(--text)';
+
+    state.assignments[heroName] = task;
+    applyAssignmentEffects(task, heroName, heroCard);
+    renderFeed(task, heroName);
+  });
+});
+
+function applyAssignmentEffects(task, heroName, heroCard) {
+  const text = task.toLowerCase();
+  let riskDelta = 0;
+  let moraleDelta = 0;
+
+  if (text.includes('fire')) riskDelta -= 10;
+  if (text.includes('rescue')) riskDelta -= 8;
+  if (text.includes('delivery')) riskDelta -= 4;
+  if (text.includes('cat')) moraleDelta += 6;
+  if (text.includes('power')) riskDelta -= 5;
+
+  state.risk = Math.max(0, Math.min(100, state.risk + riskDelta));
+  state.morale = Math.max(0, Math.min(100, state.morale + moraleDelta));
+
+  const statEls = document.querySelectorAll('.stat strong');
+  if (statEls[0]) statEls[0].textContent = `${state.risk}%`;
+  if (statEls[1]) statEls[1].textContent = `${state.morale}%`;
+
+  const bar = document.querySelector('.bar > div');
+  if (bar) bar.style.width = `${Math.max(10, 100 - state.risk)}%`;
+
+  if (heroCard) {
+    heroCard.classList.add('assigned');
+    setTimeout(() => heroCard.classList.remove('assigned'), 500);
   }
+}
+
+function renderFeed(task, heroName) {
+  const feed = document.querySelector('.feed');
+  if (!feed) return;
+
+  const lines = [
+    `<div><span class="g">&gt; ${heroName}</span> assigned to ${task}</div>`,
+    `<div><span class="c">&gt; risk</span> updated for current city load</div>`,
+    `<div><span class="y">&gt; morale</span> adjusted by assignment outcome</div>`,
+  ];
+
+  feed.innerHTML = lines.join('') + `<div>&gt; <span class="c">assignment locked</span></div>`;
 }
 </script>
 </body>
