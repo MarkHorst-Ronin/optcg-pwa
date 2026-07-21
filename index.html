@@ -3,101 +3,104 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Blacksite Access Gallery</title>
+<title>Hero Dispatch Board</title>
 <style>
   :root{
-    --bg:#0b1017;
-    --panel:#111924;
-    --line:#223042;
-    --text:#dbe9f6;
-    --muted:#7f96aa;
-    --cyan:#47d4d0;
-    --red:#ff667e;
-    --green:#8eff9a;
-    --shadow:0 24px 70px rgba(0,0,0,.55);
+    --bg:#0c1018;
+    --bg2:#111824;
+    --panel:#17202f;
+    --panel2:#1b2636;
+    --line:#314055;
+    --text:#edf4ff;
+    --muted:#8ea3bd;
+    --cyan:#59e3df;
+    --cyan2:#4cc4ff;
+    --red:#ff5d7c;
+    --yellow:#ffd166;
+    --green:#8fff9a;
+    --orange:#ff9f5a;
+    --shadow:0 22px 70px rgba(0,0,0,.48);
+    --glow:0 0 0 1px rgba(89,227,223,.22), 0 0 28px rgba(89,227,223,.12);
   }
   *{box-sizing:border-box}
   body{
     margin:0;
     min-height:100vh;
-    font-family:Inter,Segoe UI,Arial,sans-serif;
-    background:radial-gradient(circle at top,#142234 0%,#0b1017 52%,#06080c 100%);
+    background:
+      radial-gradient(circle at top left, rgba(89,227,223,.12), transparent 30%),
+      radial-gradient(circle at top right, rgba(255,93,124,.12), transparent 28%),
+      linear-gradient(180deg,#09101a 0%, #0c121d 45%, #070a11 100%);
     color:var(--text);
+    font-family:Inter,Segoe UI,Arial,sans-serif;
     padding:20px;
   }
-  .wrap{max-width:1440px;margin:0 auto}
-  .panel{
-    background:linear-gradient(180deg,rgba(18,28,40,.96),rgba(8,12,18,.98));
-    border:1px solid var(--line);
-    border-radius:18px;
-    overflow:hidden;
+  .wrap{max-width:1520px;margin:0 auto}
+  .shell{
+    background:linear-gradient(180deg, rgba(19,26,39,.98), rgba(9,12,19,.98));
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:22px;
     box-shadow:var(--shadow);
+    overflow:hidden;
+    transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+  }
+  .shell:hover{
+    transform:translateY(-2px);
+    border-color:rgba(89,227,223,.18);
+    box-shadow:0 30px 90px rgba(0,0,0,.58), var(--glow);
   }
   .top{
     display:flex;
     justify-content:space-between;
-    align-items:flex-start;
-    padding:16px;
-    border-bottom:1px solid rgba(255,255,255,.06);
     gap:16px;
+    align-items:flex-start;
+    padding:18px;
+    border-bottom:1px solid rgba(255,255,255,.06);
   }
-  .k{
-    font-size:11px;
-    letter-spacing:.18em;
+  .brand{
+    font-size:12px;
+    letter-spacing:.22em;
     text-transform:uppercase;
     color:var(--cyan);
   }
-  h1{
-    margin:5px 0 0;
-    font-size:34px;
-    line-height:1.1;
+  h1{margin:8px 0 0;font-size:38px;line-height:1.05}
+  .sub{margin-top:6px;color:var(--muted);font-size:16px}
+  .clock{
+    font-size:30px;
+    font-variant-numeric:tabular-nums;
+    color:var(--yellow);
+    transition:text-shadow .2s ease;
   }
-  .sub{margin-top:4px;color:var(--muted)}
-  .timer{font-size:30px;font-variant-numeric:tabular-nums;color:#ffce66}
-  .main{padding:16px;display:grid;gap:16px}
-  .tabs{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    padding:0 0 2px;
-  }
-  .tab{
-    border:1px solid rgba(255,255,255,.08);
-    background:rgba(255,255,255,.04);
-    color:var(--text);
-    padding:10px 14px;
-    border-radius:999px;
-    cursor:pointer;
-    font-size:13px;
-    transition:.18s ease;
-  }
-  .tab:hover{transform:translateY(-1px)}
-  .tab.active{
-    background:rgba(71,212,208,.12);
-    border-color:rgba(71,212,208,.55);
-    box-shadow:0 0 0 4px rgba(71,212,208,.07);
-  }
-  .stage{display:none}
-  .stage.active{display:block}
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-  .card{
-    background:rgba(255,255,255,.025);
+  .shell:hover .clock{text-shadow:0 0 16px rgba(255,209,102,.2)}
+  .main{padding:18px;display:grid;gap:16px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .stat{
+    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
     border:1px solid rgba(255,255,255,.06);
-    border-radius:14px;
-    padding:12px;
+    border-radius:18px;
+    padding:14px 16px;
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
   }
-  .card label{
+  .stat:hover{
+    transform:translateY(-1px);
+    border-color:rgba(89,227,223,.16);
+    box-shadow:0 0 20px rgba(89,227,223,.06);
+  }
+  .stat label{
     display:block;
-    font-size:11px;
-    letter-spacing:.12em;
     text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:11px;
     color:var(--muted);
   }
-  .card strong{display:block;margin-top:8px;font-size:20px}
+  .stat strong{
+    display:block;
+    margin-top:10px;
+    font-size:28px;
+  }
   .bar{
-    height:12px;
+    height:14px;
     border-radius:999px;
-    background:#0a0d12;
+    background:#0a0e14;
     border:1px solid rgba(255,255,255,.06);
     overflow:hidden;
   }
@@ -105,638 +108,587 @@
     width:68%;
     height:100%;
     background:linear-gradient(90deg,var(--cyan),var(--green));
+    box-shadow:0 0 18px rgba(89,227,223,.2);
   }
-  .work{
-    display:grid;
-    grid-template-columns:1.2fr .8fr;
-    gap:16px;
-    min-height:540px;
-  }
-  .screen,.terminal,.preview{
-    background:rgba(255,255,255,.02);
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:16px;
-  }
-  .head{
+  .tabs{
     display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:12px 14px;
-    border-bottom:1px solid rgba(255,255,255,.06);
-  }
-  .head .name{
-    font-size:12px;
-    letter-spacing:.16em;
-    text-transform:uppercase;
-    color:var(--muted);
-  }
-  .head .mode{font-size:12px;color:var(--text)}
-  .tools{
-    display:flex;
-    gap:10px;
     flex-wrap:wrap;
-    padding:0 14px 14px;
+    gap:10px;
   }
-  .btn{
-    padding:10px 14px;
-    border-radius:12px;
+  .tab{
+    cursor:pointer;
     border:1px solid rgba(255,255,255,.08);
     background:rgba(255,255,255,.04);
     color:var(--text);
+    border-radius:999px;
+    padding:11px 15px;
+    font-size:14px;
+    transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
   }
-  .right{display:grid;grid-template-rows:auto auto 1fr;gap:16px}
-  .terminal{
-    padding:14px;
-    font-family:ui-monospace,Consolas,monospace;
-    line-height:1.65;
-    background:#070b10;
+  .tab:hover{
+    transform:translateY(-1px);
+    border-color:rgba(89,227,223,.28);
+    box-shadow:0 0 0 1px rgba(89,227,223,.08), 0 8px 24px rgba(0,0,0,.24);
   }
-  .terminal .c{color:var(--cyan)}
-  .terminal .m{color:var(--muted)}
-  .terminal .r{color:var(--red)}
-  .terminal .g{color:var(--green)}
-  .preview{
+  .tab.active{
+    background:rgba(89,227,223,.12);
+    border-color:rgba(89,227,223,.48);
+    box-shadow:0 0 0 4px rgba(89,227,223,.08), 0 0 20px rgba(89,227,223,.12);
+  }
+  .stage{
+    display:none;
+    opacity:0;
+    transform:translateY(10px);
+    transition:opacity .24s ease, transform .24s ease;
+  }
+  .stage.active{
+    display:block;
+    opacity:1;
+    transform:translateY(0);
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:1.2fr .8fr;
+    gap:16px;
+    min-height:620px;
+  }
+  .panel,.side{
+    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:20px;
+    overflow:hidden;
+  }
+  .head{
+    padding:14px 16px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+  }
+  .head .t{
+    text-transform:uppercase;
+    letter-spacing:.18em;
+    font-size:12px;
+    color:var(--cyan);
+  }
+  .head .d{margin-top:6px;color:var(--muted)}
+  .head .tag{font-size:12px;color:var(--yellow);padding-top:2px}
+  .content{padding:16px}
+  .board{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:12px;
+  }
+  .slot{
+    border-radius:18px;
+    min-height:134px;
+    background:linear-gradient(180deg,#192334,#121a25);
+    border:1px solid rgba(255,255,255,.08);
     padding:14px;
-    min-height:220px;
+    position:relative;
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .slot:hover{
+    transform:translateY(-1px);
+    border-color:rgba(89,227,223,.22);
+    box-shadow:0 0 18px rgba(89,227,223,.08);
+  }
+  .slot .name{
+    font-size:18px;
+    font-weight:700;
+  }
+  .slot .meta{
+    position:absolute;
+    left:14px;
+    bottom:12px;
+    right:14px;
+    display:flex;
+    justify-content:space-between;
+    color:var(--muted);
+    font-size:12px;
+  }
+  .slot.hero{outline:2px solid rgba(89,227,223,.26)}
+  .slot.mission{outline:2px solid rgba(255,93,124,.24)}
+  .slot.delivery{outline:2px solid rgba(255,209,102,.24)}
+  .portrait{
+    width:54px;height:54px;border-radius:16px;
+    display:grid;place-items:center;
+    background:linear-gradient(180deg, rgba(89,227,223,.16), rgba(255,255,255,.04));
+    border:1px solid rgba(255,255,255,.08);
+    margin-bottom:10px;
+    font-size:22px;
+  }
+  .traits{
+    display:flex;flex-wrap:wrap;gap:8px;margin-top:12px
+  }
+  .chip{
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    padding:7px 10px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.03);
+    color:var(--muted);
+  }
+  .dropzone{
+    margin-top:14px;
+    border:1px dashed rgba(89,227,223,.35);
+    border-radius:16px;
+    min-height:88px;
+    display:grid;
+    place-items:center;
+    color:var(--muted);
+    background:rgba(89,227,223,.04);
+    transition:background .18s ease, border-color .18s ease, box-shadow .18s ease;
+  }
+  .dropzone.dragover{
+    background:rgba(89,227,223,.12);
+    border-color:rgba(89,227,223,.78);
+    box-shadow:0 0 18px rgba(89,227,223,.15);
+  }
+  .hero-list,.mission-list{
+    display:grid;gap:10px;
+  }
+  .card{
+    border-radius:16px;
+    padding:12px;
+    border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.03);
+    cursor:grab;
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .card:hover{
+    transform:translateY(-1px);
+    border-color:rgba(89,227,223,.22);
+    box-shadow:0 0 16px rgba(89,227,223,.07);
+  }
+  .card:active{cursor:grabbing}
+  .card .row{display:flex;justify-content:space-between;gap:10px}
+  .card .title{font-weight:700}
+  .card .subt{color:var(--muted);margin-top:6px;font-size:13px;line-height:1.4}
+  .risk{
+    display:grid;gap:14px;
+  }
+  .meter{
+    height:34px;border-radius:999px;
+    background:#0b1017;border:1px solid rgba(255,255,255,.06);
+    overflow:hidden;
+  }
+  .meter > div{
+    width:62%;height:100%;
+    background:linear-gradient(90deg,var(--green),var(--yellow),var(--red));
+  }
+  .riskbox{
+    min-height:92px;
+    border-radius:18px;
+    background:linear-gradient(180deg,#192334,#121a25);
+    border:1px solid rgba(255,255,255,.08);
+    padding:14px;
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .riskbox:hover{transform:translateY(-1px);box-shadow:0 0 18px rgba(89,227,223,.08)}
+  .call{
+    display:grid;gap:12px;
+  }
+  .callbox{
+    min-height:108px;
+    border-radius:18px;
+    background:linear-gradient(180deg,#192334,#121a25);
+    border:1px solid rgba(255,255,255,.08);
+    padding:14px;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+  }
+  .count{
+    font-size:42px;
+    color:var(--yellow);
+    font-variant-numeric:tabular-nums;
+  }
+  .routing{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:10px;
-  }
-  .tile{
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,.06);
-    background:rgba(255,255,255,.03);
-    min-height:84px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding:10px;
-    color:#d6e4ee;
-    font-size:13px;
-  }
-
-  .node-grid{
-    padding:14px;
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
     gap:12px;
   }
-  .node{
-    min-height:92px;
-    border-radius:14px;
-    background:linear-gradient(180deg,#182536,#0f151d);
-    border:1px solid rgba(255,255,255,.08);
-    position:relative;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:26px;
-    font-weight:700;
-    color:#d9fbff;
-  }
-  .node small{position:absolute;bottom:8px;right:10px;font-size:10px;color:var(--muted)}
-  .node.active{outline:2px solid rgba(71,212,208,.8);box-shadow:0 0 0 4px rgba(71,212,208,.08)}
-  .node.locked{color:var(--red)}
-  .node.open{color:var(--green)}
-
-  .timing{
-    padding:14px;
-    min-height:360px;
-    display:grid;
-    gap:16px;
-  }
-  .ring{
-    height:180px;
+  .route{
+    min-height:126px;
     border-radius:18px;
-    background:radial-gradient(circle at center,#0f1924 0%,#0b1017 70%);
-    border:1px solid rgba(255,255,255,.06);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    position:relative;
-  }
-  .ring:before{
-    content:"";
-    position:absolute;
-    width:120px;
-    height:120px;
-    border-radius:50%;
-    border:2px solid rgba(71,212,208,.8);
-    box-shadow:0 0 0 8px rgba(71,212,208,.08), inset 0 0 0 8px rgba(255,255,255,.02);
-  }
-  .ring:after{
-    content:"SYNC";
-    position:absolute;
-    font-size:13px;
-    letter-spacing:.2em;
-    color:var(--muted);
-  }
-  .bars{display:grid;gap:10px}
-  .lane{
-    height:18px;
-    border-radius:999px;
-    background:#0a0d12;
-    border:1px solid rgba(255,255,255,.06);
-    overflow:hidden;
-    position:relative;
-  }
-  .lane > div{
-    position:absolute;
-    left:0;top:0;
-    height:100%;
-    width:62%;
-    background:linear-gradient(90deg,var(--red),#ffb36c);
-  }
-  .lane:nth-child(2) > div{width:44%;background:linear-gradient(90deg,var(--cyan),#9bd2ff)}
-  .lane:nth-child(3) > div{width:78%;background:linear-gradient(90deg,var(--green),var(--cyan))}
-
-  .decrypt{
-    padding:14px;
-    min-height:360px;
-    display:grid;
-    gap:14px;
-  }
-  .matrix{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:10px;
-  }
-  .cell{
-    min-height:92px;
-    border-radius:14px;
-    background:linear-gradient(180deg,#182536,#0f151d);
+    background:linear-gradient(180deg,#192334,#121a25);
     border:1px solid rgba(255,255,255,.08);
-    position:relative;
+    padding:14px;
     display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:24px;
-    font-weight:700;
-    color:#d9fbff;
+    flex-direction:column;
+    justify-content:space-between;
   }
-  .cell:nth-child(4n+2){color:var(--cyan)}
-  .cell:nth-child(4n+4){color:var(--green)}
-  .cell:nth-child(3n){outline:2px solid rgba(255,102,126,.35)}
-  .cell small{position:absolute;bottom:8px;right:10px;font-size:10px;color:var(--muted)}
-  .scan{
-    height:16px;
-    border-radius:999px;
-    background:#0a0d12;
-    border:1px solid rgba(255,255,255,.06);
-    overflow:hidden;
-    position:relative;
+  .route .p{
+    height:12px;border-radius:999px;background:#0b1017;border:1px solid rgba(255,255,255,.06);overflow:hidden
   }
-  .scan:before{
-    content:"";
-    position:absolute;
-    left:0;top:0;bottom:0;
-    width:34%;
-    background:linear-gradient(90deg,var(--cyan),#b7f7ff);
+  .route .p > div{height:100%;width:75%;background:linear-gradient(90deg,var(--cyan),var(--green))}
+  .dialogue{
+    display:grid;gap:10px;
   }
-  .code{
-    padding:14px;
-    min-height:360px;
-    display:grid;
-    gap:12px;
-  }
-  .lines{
-    font-family:ui-monospace,Consolas,monospace;
-    background:#070b10;
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:14px;
-    padding:14px;
-    line-height:1.7;
-  }
-  .lines .n{color:var(--muted)}
-  .lines .c{color:var(--cyan)}
-  .lines .r{color:var(--red)}
-  .lines .g{color:var(--green)}
-  .input{
-    height:58px;
-    border-radius:14px;
-    background:linear-gradient(180deg,#182536,#0f151d);
-    border:1px solid rgba(255,255,255,.08);
-    display:flex;
-    align-items:center;
-    padding:0 14px;
-    font-family:ui-monospace,Consolas,monospace;
-    color:#d9fbff;
-  }
-  .input:before{content:">";margin-right:10px;color:var(--cyan)}
-
-  .fire{
-    padding:14px;
-    min-height:360px;
-    display:grid;
-    gap:12px;
-  }
-  .lanes{display:grid;gap:12px}
-  .laneBox{
-    height:72px;
-    border-radius:14px;
-    background:linear-gradient(180deg,#182536,#0f151d);
-    border:1px solid rgba(255,255,255,.08);
-    position:relative;
-    overflow:hidden;
-  }
-  .laneBox:before{
-    content:"";
-    position:absolute;left:0;top:0;bottom:0;width:62%;
-    background:linear-gradient(90deg,rgba(255,102,126,.9),rgba(255,206,102,.82));
-  }
-  .laneBox:nth-child(2):before{width:38%;background:linear-gradient(90deg,var(--cyan),#9bd2ff)}
-  .laneBox:nth-child(3):before{width:78%;background:linear-gradient(90deg,var(--green),var(--cyan))}
-  .laneBox .txt{
-    position:absolute;left:14px;top:12px;
-    font-size:12px;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    color:#eaf3ff;
-  }
-  .laneBox .val{
-    position:absolute;right:14px;bottom:10px;
-    color:var(--muted);
-    font-size:12px;
-  }
-  .shield{
-    height:150px;
-    border-radius:18px;
-    background:radial-gradient(circle at center,#101a26 0%,#0b1017 72%);
-    border:1px solid rgba(255,255,255,.06);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    position:relative;
-  }
-  .shield:before{
-    content:"SHIELD";
-    font-size:13px;
-    letter-spacing:.2em;
-    color:var(--muted);
-  }
-  .shield:after{
-    content:"";
-    position:absolute;
-    width:118px;height:118px;border-radius:50%;
-    border:2px solid rgba(71,212,208,.82);
-    box-shadow:0 0 0 8px rgba(71,212,208,.08), inset 0 0 0 8px rgba(255,255,255,.02);
-  }
-
-  .memory{
-    padding:14px;
-    min-height:360px;
-    display:grid;
-    gap:12px;
-  }
-  .cards{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:12px;
-  }
-  .memo{
-    min-height:106px;
-    border-radius:14px;
-    background:linear-gradient(180deg,#182536,#0f151d);
-    border:1px solid rgba(255,255,255,.08);
-    position:relative;
-    padding:14px;
-    color:#d9fbff;
-  }
-  .memo:nth-child(2n){outline:2px solid rgba(71,212,208,.35)}
-  .memo:nth-child(3n){color:var(--green)}
-  .memo .title{
-    font-size:12px;
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    color:var(--muted);
-  }
-  .memo .body{
-    margin-top:10px;
-    font-size:14px;
-    line-height:1.5;
-    color:inherit;
-  }
-  .memo .id{
-    position:absolute;
-    right:12px;
-    bottom:10px;
-    font-size:10px;
-    color:var(--muted);
-  }
-  .ghosts{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:10px;
-  }
-  .ghost{
-    height:74px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,.06);
+  .choice{
+    border-radius:16px;
     background:rgba(255,255,255,.03);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#d6e4ee;
-    font-size:13px;
+    border:1px solid rgba(255,255,255,.08);
+    padding:12px 14px;
+    transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
   }
-
-  .overview{
+  .choice:hover{
+    transform:translateY(-1px);
+    border-color:rgba(89,227,223,.22);
+    box-shadow:0 0 16px rgba(89,227,223,.07);
+  }
+  .side{padding:16px;display:grid;gap:14px}
+  .feed{
+    font-family:ui-monospace,Consolas,monospace;
+    background:#070b11;
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,.06);
     padding:14px;
-    min-height:360px;
-    display:grid;
-    gap:12px;
+    line-height:1.65;
+    min-height:220px;
   }
-  .stack{
-    display:grid;
-    gap:10px;
-  }
+  .feed .g{color:var(--green)}
+  .feed .c{color:var(--cyan)}
+  .feed .r{color:var(--red)}
+  .feed .y{color:var(--yellow)}
   .mini{
-    min-height:74px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,.06);
-    background:rgba(255,255,255,.03);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding:10px;
-    color:#d6e4ee;
+    border-radius:18px;
+    background:linear-gradient(180deg,#192334,#121a25);
+    border:1px solid rgba(255,255,255,.08);
+    padding:14px;
   }
-
-  @media (max-width: 1000px){
-    .work{grid-template-columns:1fr}
+  .mini h3{margin:0 0 8px;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .mini p{margin:0;color:var(--text);line-height:1.55}
+  @media (max-width: 1100px){
+    .grid{grid-template-columns:1fr}
     .stats{grid-template-columns:repeat(2,1fr)}
+    .board{grid-template-columns:1fr}
+    .routing{grid-template-columns:1fr}
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <section class="panel">
+  <div class="shell">
     <div class="top">
       <div>
-        <div class="k">BLACKSITE ACCESS // PROTOTYPE 01</div>
-        <h1>Network Breach Console</h1>
-        <div class="sub">Tab gallery — switch between all six hacking modes</div>
+        <div class="brand">Dispatch Style Prototype</div>
+        <h1>Hero Operations Center</h1>
+        <div class="sub">Comic-book management interface with five original mini-games</div>
       </div>
-      <div class="timer">00:42</div>
+      <div class="clock">00:42</div>
     </div>
 
     <div class="main">
-      <div class="tabs" role="tablist" aria-label="Hacking modes">
-        <button class="tab active" data-tab="circuit">Circuit Routing</button>
-        <button class="tab" data-tab="signal">Signal Timing</button>
-        <button class="tab" data-tab="decrypt">Decrypt Pattern</button>
-        <button class="tab" data-tab="firewall">Firewall Defense</button>
-        <button class="tab" data-tab="memory">Memory Spoof</button>
-        <button class="tab" data-tab="code">Code Sequence</button>
-      </div>
-
       <div class="stats">
-        <div class="card"><label>Trace</label><strong style="color:var(--red)">67%</strong></div>
-        <div class="card"><label>Access</label><strong style="color:var(--cyan)">42%</strong></div>
-        <div class="card"><label>Power</label><strong style="color:var(--green)">3</strong></div>
-        <div class="card"><label>Signal</label><strong>87%</strong></div>
+        <div class="stat"><label>City Risk</label><strong style="color:var(--red)">67%</strong></div>
+        <div class="stat"><label>Team Morale</label><strong style="color:var(--cyan)">42%</strong></div>
+        <div class="stat"><label>Power Cells</label><strong style="color:var(--green)">8</strong></div>
+        <div class="stat"><label>Active Calls</label><strong>3</strong></div>
       </div>
 
       <div class="bar"><div></div></div>
 
-      <div class="stage active" id="circuit">
-        <div class="work">
-          <div class="screen">
-            <div class="head"><div><div class="name">Circuit Routing</div><div class="sub">Link broken traces before the system locks</div></div><div class="mode">LVL 03</div></div>
-            <div class="node-grid">
-              <div class="node active">A<small>source</small></div>
-              <div class="node open">B<small>node</small></div>
-              <div class="node locked">X<small>break</small></div>
-              <div class="node">C<small>relay</small></div>
-              <div class="node">D<small>relay</small></div>
-              <div class="node open">E<small>junction</small></div>
-              <div class="node active">F<small>node</small></div>
-              <div class="node locked">Y<small>break</small></div>
-              <div class="node">G<small>link</small></div>
-              <div class="node">H<small>link</small></div>
-              <div class="node">I<small>link</small></div>
-              <div class="node open">J<small>exit</small></div>
+      <div class="tabs" role="tablist" aria-label="Mini games">
+        <button class="tab active" data-tab="assign">Assignment Board</button>
+        <button class="tab" data-tab="risk">Risk Meter</button>
+        <button class="tab" data-tab="call">Emergency Call</button>
+        <button class="tab" data-tab="route">Resource Routing</button>
+        <button class="tab" data-tab="dialogue">Dialogue Choice</button>
+      </div>
+
+      <section class="stage active" id="assign">
+        <div class="grid">
+          <div class="panel">
+            <div class="head">
+              <div><div class="t">Assignment Board</div><div class="d">Drag heroes to emergencies, chores, and deliveries</div></div>
+              <div class="tag">Operations</div>
             </div>
-            <div class="tools"><button class="btn">Route</button><button class="btn">Bridge</button><button class="btn">Bypass</button><button class="btn">Abort</button></div>
-          </div>
-          <div class="right">
-            <div class="terminal">
-              <div><span class="g">&gt; power reroute accepted</span></div>
-              <div><span class="m">&gt; scanning broken paths ...</span></div>
-              <div><span class="c">&gt; node 2 active</span></div>
-              <div><span class="r">&gt; junction X blocked</span></div>
-              <div><span class="m">&gt; select next bridge</span></div>
-              <div>&gt; <span class="c">_</span></div>
-            </div>
-            <div class="screen">
-              <div class="head"><div><div class="name">Preview</div><div class="sub">Board, trace, bridge tool</div></div></div>
-              <div class="preview">
-                <div class="tile">node map</div><div class="tile">live trace</div><div class="tile">bridge tool</div><div class="tile">exit gate</div>
+            <div class="content">
+              <div class="board">
+                <div class="slot hero">
+                  <div class="portrait">A</div>
+                  <div class="name">Aster</div>
+                  <div class="sub">Speed / Rescue / Improvisation</div>
+                  <div class="traits"><span class="chip">Fast</span><span class="chip">Bright</span><span class="chip">Risky</span></div>
+                  <div class="dropzone" ondragover="event.preventDefault()" ondrop="dropTo(event,this)">Drop mission here</div>
+                </div>
+                <div class="slot hero">
+                  <div class="portrait">B</div>
+                  <div class="name">Bolt</div>
+                  <div class="sub">Power / Shield / Crowd Control</div>
+                  <div class="traits"><span class="chip">Strong</span><span class="chip">Steady</span><span class="chip">Loud</span></div>
+                  <div class="dropzone" ondragover="event.preventDefault()" ondrop="dropTo(event,this)">Drop mission here</div>
+                </div>
+                <div class="slot hero">
+                  <div class="portrait">M</div>
+                  <div class="name">Mira</div>
+                  <div class="sub">Tech / Scan / Clean-up</div>
+                  <div class="traits"><span class="chip">Smart</span><span class="chip">Precise</span><span class="chip">Calm</span></div>
+                  <div class="dropzone" ondragover="event.preventDefault()" ondrop="dropTo(event,this)">Drop mission here</div>
+                </div>
               </div>
+
+              <div style="height:14px"></div>
+
+              <div class="board">
+                <div class="slot mission" draggable="true" ondragstart="drag(event)" data-task="Fire at harbor" data-type="emergency">
+                  <div class="name">Fire at harbor</div>
+                  <div class="subt">Civilians trapped, time limit 02:00, heat hazard high.</div>
+                  <div class="meta"><span>Emergency</span><span>+30 reward</span></div>
+                </div>
+                <div class="slot delivery" draggable="true" ondragstart="drag(event)" data-task="Replace power cells" data-type="delivery">
+                  <div class="name">Replace power cells</div>
+                  <div class="subt">Routine delivery to downtown grid. Needs accuracy, not brute force.</div>
+                  <div class="meta"><span>Delivery</span><span>+12 reward</span></div>
+                </div>
+                <div class="slot mission" draggable="true" ondragstart="drag(event)" data-task="Cat rescue on roof" data-type="chore">
+                  <div class="name">Cat rescue on roof</div>
+                  <div class="subt">Low threat, high public visibility, must keep morale up.</div>
+                  <div class="meta"><span>Chore</span><span>+5 reward</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="side">
+            <div class="mini">
+              <h3>How it plays</h3>
+              <p>Pick a mission card and drag it onto a hero to assign the job. The board is designed like an in-office dispatch table with comic-book energy.</p>
+            </div>
+            <div class="feed">
+              <div><span class="g">&gt; Aster</span> ready for fast response</div>
+              <div><span class="c">&gt; Bolt</span> best for heavy threats</div>
+              <div><span class="y">&gt; Mira</span> boosts efficiency and cleanup</div>
+              <div><span class="r">&gt; Fire at harbor</span> active, countdown running</div>
+              <div>&gt; <span class="c">drag mission to hero slot</span></div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="stage" id="signal">
-        <div class="work">
-          <div class="screen">
-            <div class="head"><div><div class="name">Signal Timing</div><div class="sub">Strike the pulse when the window turns active</div></div><div class="mode">LVL 03</div></div>
-            <div class="timing">
-              <div class="ring"></div>
-              <div class="bars">
-                <div class="lane"><div></div></div>
-                <div class="lane"><div></div></div>
-                <div class="lane"><div></div></div>
+      <section class="stage" id="risk">
+        <div class="grid">
+          <div class="panel">
+            <div class="head">
+              <div><div class="t">Risk Meter</div><div class="d">Balance hero traits against mission threat levels</div></div>
+              <div class="tag">Threat Eval</div>
+            </div>
+            <div class="content risk">
+              <div class="riskbox">
+                <div style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+                  <div>
+                    <div class="t">Current Match</div>
+                    <div class="name" style="font-size:22px;margin-top:6px">Bolt vs. Armored Riot</div>
+                  </div>
+                  <div style="font-size:38px;color:var(--yellow)">78</div>
+                </div>
+                <div style="height:10px"></div>
+                <div class="meter"><div></div></div>
+                <div style="height:10px"></div>
+                <div class="sub">Too much threat pushes the bar red. Strong match-ups keep the mission in the safe zone.</div>
+              </div>
+
+              <div class="board">
+                <div class="slot hero">
+                  <div class="name">Trait boosts</div>
+                  <div class="traits"><span class="chip">Shield +20</span><span class="chip">Crowd +15</span><span class="chip">Speed +5</span></div>
+                </div>
+                <div class="slot mission">
+                  <div class="name">Threat types</div>
+                  <div class="traits"><span class="chip">Armor</span><span class="chip">Heat</span><span class="chip">Chaos</span></div>
+                </div>
+                <div class="slot delivery">
+                  <div class="name">Best result</div>
+                  <div class="subt">Match the hero with the strongest trait advantage to reduce damage and failure chance.</div>
+                </div>
               </div>
             </div>
-            <div class="tools"><button class="btn">Sync</button><button class="btn">Hold</button><button class="btn">Pulse</button><button class="btn">Abort</button></div>
           </div>
-          <div class="right">
-            <div class="terminal">
-              <div><span class="g">&gt; carrier locked</span></div>
-              <div><span class="m">&gt; timing sweep active ...</span></div>
-              <div><span class="c">&gt; window opens in 2.4s</span></div>
-              <div><span class="r">&gt; missed pulse detected</span></div>
-              <div><span class="m">&gt; recalibrating</span></div>
-              <div>&gt; <span class="c">_</span></div>
+
+          <div class="side">
+            <div class="mini">
+              <h3>System note</h3>
+              <p>Use the meter like a comic-book danger gauge. Green means clean deployment, yellow means caution, red means bad odds.</p>
             </div>
-            <div class="screen">
-              <div class="head"><div><div class="name">Preview</div><div class="sub">Pulse ring, window bars, sync meter</div></div></div>
-              <div class="preview">
-                <div class="tile">pulse ring</div><div class="tile">window bar</div><div class="tile">sync meter</div><div class="tile">cooldown</div>
-              </div>
+            <div class="feed">
+              <div><span class="g">&gt; advantage</span> detected: shield vs armor</div>
+              <div><span class="y">&gt; caution</span> if mission adds heat</div>
+              <div><span class="r">&gt; failure</span> chance rises if mismatched</div>
+              <div>&gt; keep the meter below <span class="c">80%</span></div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="stage" id="decrypt">
-        <div class="work">
-          <div class="screen">
-            <div class="head"><div><div class="name">Decrypt Pattern</div><div class="sub">Align the symbols before the sequence collapses</div></div><div class="mode">LVL 03</div></div>
-            <div class="decrypt">
-              <div class="matrix">
-                <div class="cell">∆<small>01</small></div>
-                <div class="cell">◊<small>02</small></div>
-                <div class="cell">□<small>03</small></div>
-                <div class="cell">◇<small>04</small></div>
-                <div class="cell">△<small>05</small></div>
-                <div class="cell">◌<small>06</small></div>
-                <div class="cell">▣<small>07</small></div>
-                <div class="cell">◈<small>08</small></div>
-              </div>
-              <div class="ring"></div>
-              <div class="scan"></div>
+      <section class="stage" id="call">
+        <div class="grid">
+          <div class="panel">
+            <div class="head">
+              <div><div class="t">Emergency Call</div><div class="d">Respond before the timer expires</div></div>
+              <div class="tag">00:12</div>
             </div>
-            <div class="tools"><button class="btn">Scan</button><button class="btn">Lock</button><button class="btn">Reveal</button><button class="btn">Abort</button></div>
+            <div class="content call">
+              <div class="callbox">
+                <div>
+                  <div class="t">Incoming</div>
+                  <div class="name" style="font-size:22px;margin-top:6px">Bank alarm in Midtown</div>
+                  <div class="sub">Choose response: stealth, brute force, or fast extraction</div>
+                </div>
+                <div class="count">12</div>
+              </div>
+              <div class="board">
+                <div class="slot mission">
+                  <div class="name">Response A</div>
+                  <div class="subt">Send Bolt for direct intervention. Higher risk, faster resolution.</div>
+                </div>
+                <div class="slot delivery">
+                  <div class="name">Response B</div>
+                  <div class="subt">Send Mira for scan and control. Safer, but slower.</div>
+                </div>
+                <div class="slot hero">
+                  <div class="name">Response C</div>
+                  <div class="subt">Send Aster for extraction. Best if civilians are trapped.</div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="right">
-            <div class="terminal">
-              <div><span class="g">&gt; encrypted block found</span></div>
-              <div><span class="m">&gt; symbol matrix loading ...</span></div>
-              <div><span class="c">&gt; 4 fragments matched</span></div>
-              <div><span class="r">&gt; mismatch on row 3</span></div>
-              <div><span class="m">&gt; try alternate key</span></div>
-              <div>&gt; <span class="c">_</span></div>
+
+          <div class="side">
+            <div class="mini">
+              <h3>Prompt feel</h3>
+              <p>This one should feel urgent and readable, like a television cut-in with a countdown and a clear choice.</p>
             </div>
-            <div class="screen">
-              <div class="head"><div><div class="name">Preview</div><div class="sub">Symbol wall, decode ring, scan line</div></div></div>
-              <div class="preview">
-                <div class="tile">symbol wall</div><div class="tile">decode ring</div><div class="tile">scan line</div><div class="tile">key meter</div>
-              </div>
+            <div class="feed">
+              <div><span class="r">&gt; alarm</span> triggered in sector 4</div>
+              <div><span class="y">&gt; timer</span> approaching zero</div>
+              <div><span class="c">&gt; choose hero</span> before escalation</div>
+              <div>&gt; <span class="g">quick decisions matter</span></div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="stage" id="firewall">
-        <div class="work">
-          <div class="screen">
-            <div class="head"><div><div class="name">Firewall Defense</div><div class="sub">Contain the breach and shield the core</div></div><div class="mode">LVL 03</div></div>
-            <div class="fire">
-              <div class="shield"></div>
-              <div class="lanes">
-                <div class="laneBox"><div class="txt">packet lane 01</div><div class="val">blocked</div></div>
-                <div class="laneBox"><div class="txt">packet lane 02</div><div class="val">active</div></div>
-                <div class="laneBox"><div class="txt">packet lane 03</div><div class="val">incoming</div></div>
+      <section class="stage" id="route">
+        <div class="grid">
+          <div class="panel">
+            <div class="head">
+              <div><div class="t">Resource Routing</div><div class="d">Manage power, cooldowns, and team coverage</div></div>
+              <div class="tag">Supply Grid</div>
+            </div>
+            <div class="content">
+              <div class="routing">
+                <div class="route">
+                  <div><div class="t">Power Allocation</div><div class="sub">Budget three power cells across active missions.</div></div>
+                  <div class="p"><div></div></div>
+                </div>
+                <div class="route">
+                  <div><div class="t">Cooldown Sync</div><div class="sub">Rotate exhausted heroes back into reserve.</div></div>
+                  <div class="p"><div style="width:48%;background:linear-gradient(90deg,var(--orange),var(--yellow))"></div></div>
+                </div>
+                <div class="route">
+                  <div><div class="t">Coverage Map</div><div class="sub">Keep all city sectors staffed.</div></div>
+                  <div class="p"><div style="width:84%;background:linear-gradient(90deg,var(--cyan2),var(--green))"></div></div>
+                </div>
+                <div class="route">
+                  <div><div class="t">Reserve Pool</div><div class="sub">Hold one hero back for emergencies.</div></div>
+                  <div class="p"><div style="width:26%;background:linear-gradient(90deg,var(--red),var(--orange))"></div></div>
+                </div>
               </div>
             </div>
-            <div class="tools"><button class="btn">Block</button><button class="btn">Shield</button><button class="btn">Quarantine</button><button class="btn">Abort</button></div>
           </div>
-          <div class="right">
-            <div class="terminal">
-              <div><span class="r">&gt; firewall pressure rising</span></div>
-              <div><span class="m">&gt; packet stream detected ...</span></div>
-              <div><span class="c">&gt; shield field active</span></div>
-              <div><span class="g">&gt; lane 01 neutralized</span></div>
-              <div><span class="m">&gt; waiting for next wave</span></div>
-              <div>&gt; <span class="c">_</span></div>
+
+          <div class="side">
+            <div class="mini">
+              <h3>Routing feel</h3>
+              <p>This mini-game works best as a simple planning puzzle: where do you spend the limited battery, and when do you save power for later?</p>
             </div>
-            <div class="screen">
-              <div class="head"><div><div class="name">Preview</div><div class="sub">Shield core, packet lanes, block buttons</div></div></div>
-              <div class="preview">
-                <div class="tile">shield core</div><div class="tile">packet lanes</div><div class="tile">block button</div><div class="tile">status feed</div>
-              </div>
+            <div class="feed">
+              <div><span class="g">&gt; power</span> cells available: 8</div>
+              <div><span class="c">&gt; reserve</span> hero recommended</div>
+              <div><span class="y">&gt; cooldown</span> management active</div>
+              <div>&gt; coverage gaps raise city risk</div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="stage" id="memory">
-        <div class="work">
-          <div class="screen">
-            <div class="head"><div><div class="name">Memory Spoof</div><div class="sub">Match the fragments before they fade</div></div><div class="mode">LVL 03</div></div>
-            <div class="memory">
-              <div class="cards">
-                <div class="memo"><div class="title">fragment 01</div><div class="body">Access key: ? ? ?<br/>Location: west archive</div><div class="id">M-01</div></div>
-                <div class="memo"><div class="title">fragment 02</div><div class="body">Door code: 4 • 7 • ?<br/>Operator: unknown</div><div class="id">M-02</div></div>
-                <div class="memo"><div class="title">fragment 03</div><div class="body">Route: node A → ? → J<br/>Signal: unstable</div><div class="id">M-03</div></div>
-                <div class="memo"><div class="title">fragment 04</div><div class="body">Alias: ████<br/>Status: redacted</div><div class="id">M-04</div></div>
+      <section class="stage" id="dialogue">
+        <div class="grid">
+          <div class="panel">
+            <div class="head">
+              <div><div class="t">Dialogue Choice</div><div class="d">Handle office banter and story moments</div></div>
+              <div class="tag">Branching Talk</div>
+            </div>
+            <div class="content dialogue">
+              <div class="callbox">
+                <div>
+                  <div class="t">Scene</div>
+                  <div class="name" style="font-size:22px;margin-top:6px">The team wants an explanation</div>
+                  <div class="sub">Choose your tone carefully. Morale changes based on your answer.</div>
+                </div>
+                <div class="portrait" style="margin:0">R</div>
               </div>
-              <div class="ghosts">
-                <div class="ghost">slot 1</div><div class="ghost">slot 2</div><div class="ghost">slot 3</div>
+              <div class="choice">
+                <div class="name">Option 1: Keep it professional</div>
+                <div class="subt">“We focus on the mission first. Questions later.”</div>
+              </div>
+              <div class="choice">
+                <div class="name">Option 2: Joke it off</div>
+                <div class="subt">“If you all survive this shift, I’ll explain everything.”</div>
+              </div>
+              <div class="choice">
+                <div class="name">Option 3: Be honest</div>
+                <div class="subt">“Things are worse than I said, but I trust you to handle it.”</div>
               </div>
             </div>
-            <div class="tools"><button class="btn">Recall</button><button class="btn">Lock</button><button class="btn">Spoof</button><button class="btn">Abort</button></div>
           </div>
-          <div class="right">
-            <div class="terminal">
-              <div><span class="g">&gt; memory fragments found</span></div>
-              <div><span class="m">&gt; reconstruction required ...</span></div>
-              <div><span class="c">&gt; 3 slots active</span></div>
-              <div><span class="r">&gt; corrupted segment detected</span></div>
-              <div><span class="m">&gt; choose missing piece</span></div>
-              <div>&gt; <span class="c">_</span></div>
+
+          <div class="side">
+            <div class="mini">
+              <h3>Dialogue feel</h3>
+              <p>Make this one look like comic-book cutscene choices: readable, bold, and emotionally clear.</p>
             </div>
-            <div class="screen">
-              <div class="head"><div><div class="name">Preview</div><div class="sub">Fragment cards and memory slots</div></div></div>
-              <div class="preview">
-                <div class="tile">memory cards</div><div class="tile">blank slots</div><div class="tile">fade effect</div><div class="tile">lock input</div>
-              </div>
+            <div class="feed">
+              <div><span class="c">&gt; morale</span> can rise or fall</div>
+              <div><span class="y">&gt; trust</span> affects future missions</div>
+              <div><span class="g">&gt; humor</span> can calm the team</div>
+              <div>&gt; story choices change relationships</div>
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="stage" id="code">
-        <div class="work">
-          <div class="screen">
-            <div class="head"><div><div class="name">Code Sequence</div><div class="sub">Assemble the command chain before timeout</div></div><div class="mode">LVL 03</div></div>
-            <div class="code">
-              <div class="lines">
-                <div><span class="n">01</span> <span class="c">init_link</span> --target vault_07</div>
-                <div><span class="n">02</span> <span class="c">scan_ports</span> --fast</div>
-                <div><span class="n">03</span> <span class="r">decrypt_key</span> --fallback</div>
-                <div><span class="n">04</span> <span class="m">route_packet</span> --safe</div>
-                <div><span class="n">05</span> <span class="g">override_firewall</span> --hold</div>
-              </div>
-              <div class="input">type command...</div>
-              <div class="stack">
-                <div class="mini">step 1</div>
-                <div class="mini">step 2</div>
-                <div class="mini">step 3</div>
-              </div>
-            </div>
-            <div class="tools"><button class="btn">Submit</button><button class="btn">Hint</button><button class="btn">Shuffle</button><button class="btn">Abort</button></div>
-          </div>
-          <div class="right">
-            <div class="terminal">
-              <div><span class="g">&gt; command chain detected</span></div>
-              <div><span class="m">&gt; input queue waiting ...</span></div>
-              <div><span class="c">&gt; syntax check active</span></div>
-              <div><span class="r">&gt; step 3 missing</span></div>
-              <div><span class="m">&gt; continue sequence</span></div>
-              <div>&gt; <span class="c">_</span></div>
-            </div>
-            <div class="screen">
-              <div class="head"><div><div class="name">Preview</div><div class="sub">Terminal-first command puzzle</div></div></div>
-              <div class="preview">
-                <div class="tile">command list</div><div class="tile">input line</div><div class="tile">step order</div><div class="tile">submit state</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      </section>
     </div>
-  </section>
+  </div>
 </div>
 
 <script>
-  const tabs = document.querySelectorAll('.tab');
-  const stages = document.querySelectorAll('.stage');
+const tabs = document.querySelectorAll('.tab');
+const stages = document.querySelectorAll('.stage');
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      stages.forEach(s => s.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById(tab.dataset.tab).classList.add('active');
-    });
+tabs.forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    tabs.forEach(t=>t.classList.remove('active'));
+    stages.forEach(s=>s.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(tab.dataset.tab).classList.add('active');
   });
+});
+
+function drag(ev){
+  ev.dataTransfer.setData("text/plain", ev.target.dataset.task || ev.target.querySelector('.name')?.textContent || '');
+}
+function dropTo(ev, zone){
+  ev.preventDefault();
+  const task = ev.dataTransfer.getData("text/plain");
+  if(task){
+    zone.textContent = "Assigned: " + task;
+    zone.classList.add('dragover');
+    setTimeout(()=>zone.classList.remove('dragover'), 500);
+  }
+}
 </script>
 </body>
 </html>
