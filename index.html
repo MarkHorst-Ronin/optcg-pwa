@@ -3,770 +3,1080 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Hero Dispatch Board</title>
+<title>Night Shift — Dispatch Console Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0c1018;
-    --bg2:#111824;
-    --panel:#17202f;
-    --panel2:#1b2636;
-    --line:#314055;
-    --text:#edf4ff;
-    --muted:#8ea3bd;
-    --cyan:#59e3df;
-    --cyan2:#4cc4ff;
-    --red:#ff5d7c;
+    --ink:#0b0d12;
+    --panel:#12151d;
+    --paper:#171b26;
+    --line:#2a3040;
+    --text:#eef2fa;
+    --muted:#8b94ab;
+    --orange:#ff8a2a;
+    --amber:#ffb84d;
+    --green:#49e06b;
+    --red:#ff3b57;
+    --blue:#3fa9ff;
     --yellow:#ffd166;
-    --green:#8fff9a;
-    --orange:#ff9f5a;
-    --shadow:0 22px 70px rgba(0,0,0,.48);
-    --glow:0 0 0 1px rgba(89,227,223,.22), 0 0 28px rgba(89,227,223,.12);
+    --shadow:0 26px 80px rgba(0,0,0,.6);
   }
   *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
   body{
     margin:0;
     min-height:100vh;
-    background:
-      radial-gradient(circle at top left, rgba(89,227,223,.12), transparent 30%),
-      radial-gradient(circle at top right, rgba(255,93,124,.12), transparent 28%),
-      linear-gradient(180deg,#09101a 0%, #0c121d 45%, #070a11 100%);
     color:var(--text);
-    font-family:Inter,Segoe UI,Arial,sans-serif;
+    font-family:"Barlow Condensed",Arial,sans-serif;
+    font-size:17px;
+    background:
+      radial-gradient(circle at 12% -4%, rgba(63,169,255,.10), transparent 34%),
+      radial-gradient(circle at 88% -6%, rgba(255,59,87,.10), transparent 30%),
+      linear-gradient(180deg,#0d1017 0%, #0b0d12 55%, #07080c 100%);
     padding:20px;
   }
-  .wrap{max-width:1520px;margin:0 auto}
-  .shell{
-    background:linear-gradient(180deg, rgba(19,26,39,.98), rgba(9,12,19,.98));
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:22px;
+  /* comic halftone overlay */
+  body:before{
+    content:"";
+    position:fixed;inset:0;
+    pointer-events:none;
+    background-image:radial-gradient(rgba(255,255,255,.05) 1px, transparent 1.4px);
+    background-size:14px 14px;
+    opacity:.35;
+    z-index:0;
+  }
+  .wrap{max-width:1480px;margin:0 auto;position:relative;z-index:1}
+  .console{
+    background:linear-gradient(180deg,#131722 0%, #0d1017 100%);
+    border:1px solid var(--line);
+    border-radius:20px;
     box-shadow:var(--shadow);
     overflow:hidden;
-    transition:transform .22s ease, box-shadow .22s ease, border-color .22s ease;
   }
-  .shell:hover{
-    transform:translateY(-2px);
-    border-color:rgba(89,227,223,.18);
-    box-shadow:0 30px 90px rgba(0,0,0,.58), var(--glow);
-  }
-  .top{
+
+  /* ============ header ============ */
+  .masthead{
+    position:relative;
+    padding:22px 24px 20px;
+    border-bottom:1px solid var(--line);
+    background:
+      repeating-linear-gradient(-58deg, transparent 0 26px, rgba(255,138,42,.05) 26px 30px),
+      linear-gradient(180deg,#151a26,#10131c);
     display:flex;
     justify-content:space-between;
-    gap:16px;
-    align-items:flex-start;
-    padding:18px;
-    border-bottom:1px solid rgba(255,255,255,.06);
+    gap:20px;
+    align-items:flex-end;
+    flex-wrap:wrap;
   }
-  .brand{
-    font-size:12px;
-    letter-spacing:.22em;
+  .stamp{
+    font-size:13px;
+    letter-spacing:.34em;
     text-transform:uppercase;
-    color:var(--cyan);
+    color:var(--orange);
   }
-  h1{margin:8px 0 0;font-size:38px;line-height:1.05}
-  .sub{margin-top:6px;color:var(--muted);font-size:16px}
-  .clock{
-    font-size:30px;
-    font-variant-numeric:tabular-nums;
-    color:var(--yellow);
-    transition:text-shadow .2s ease;
-  }
-  .shell:hover .clock{text-shadow:0 0 16px rgba(255,209,102,.2)}
-  .main{padding:18px;display:grid;gap:16px}
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-  .stat{
-    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:18px;
-    padding:14px 16px;
-    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-  }
-  .stat:hover{
-    transform:translateY(-1px);
-    border-color:rgba(89,227,223,.16);
-    box-shadow:0 0 20px rgba(89,227,223,.06);
-  }
-  .stat label{
-    display:block;
+  h1{
+    margin:6px 0 0;
+    font-family:Anton, "Barlow Condensed", sans-serif;
+    font-weight:400;
+    font-size:clamp(34px, 5vw, 58px);
+    line-height:.98;
+    letter-spacing:.02em;
     text-transform:uppercase;
-    letter-spacing:.14em;
-    font-size:11px;
-    color:var(--muted);
   }
-  .stat strong{
-    display:block;
-    margin-top:10px;
-    font-size:28px;
+  h1 .pop{color:var(--orange)}
+  .masthead .sub{margin-top:8px;color:var(--muted);max-width:640px;line-height:1.45}
+  .shiftcard{
+    text-align:right;
+    font-family:Anton,sans-serif;
+    text-transform:uppercase;
   }
-  .bar{
-    height:14px;
-    border-radius:999px;
-    background:#0a0e14;
-    border:1px solid rgba(255,255,255,.06);
+  .shiftcard .lbl{font-family:"Barlow Condensed";font-size:12px;letter-spacing:.3em;color:var(--muted)}
+  .shiftcard .t{font-size:40px;color:var(--yellow);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+
+  /* ============ countdown bar (orange, like the hack timer) ============ */
+  .shiftbar{
+    height:16px;
+    background:#0a0c11;
+    border-bottom:1px solid var(--line);
+    position:relative;
     overflow:hidden;
   }
-  .bar > div{
-    width:68%;
+  .shiftbar > div{
     height:100%;
-    background:linear-gradient(90deg,var(--cyan),var(--green));
-    box-shadow:0 0 18px rgba(89,227,223,.2);
+    width:72%;
+    background:repeating-linear-gradient(-45deg, var(--orange) 0 12px, var(--amber) 12px 24px);
+    box-shadow:0 0 22px rgba(255,138,42,.45);
+    transition:width .2s linear;
   }
-  .tabs{
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-  }
+
+  .deck{padding:18px;display:grid;gap:16px}
+
+  /* ============ tabs ============ */
+  .tabs{display:flex;flex-wrap:wrap;gap:10px}
   .tab{
     cursor:pointer;
-    border:1px solid rgba(255,255,255,.08);
-    background:rgba(255,255,255,.04);
-    color:var(--text);
-    border-radius:999px;
-    padding:11px 15px;
-    font-size:14px;
-    transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    font-family:Anton,sans-serif;
+    font-weight:400;
+    font-size:15px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    background:#10141d;
+    border:1px solid var(--line);
+    padding:12px 18px 10px;
+    border-radius:4px 12px 4px 12px;
+    transform:skewX(-6deg);
+    transition:all .15s ease;
   }
-  .tab:hover{
-    transform:translateY(-1px);
-    border-color:rgba(89,227,223,.28);
-    box-shadow:0 0 0 1px rgba(89,227,223,.08), 0 8px 24px rgba(0,0,0,.24);
-  }
+  .tab > span{display:inline-block;transform:skewX(6deg)}
+  .tab:hover{color:var(--text);border-color:#3a445c}
   .tab.active{
-    background:rgba(89,227,223,.12);
-    border-color:rgba(89,227,223,.48);
-    box-shadow:0 0 0 4px rgba(89,227,223,.08), 0 0 20px rgba(89,227,223,.12);
+    color:#0b0d12;
+    background:var(--orange);
+    border-color:var(--orange);
+    box-shadow:0 6px 24px rgba(255,138,42,.35);
   }
-  .stage{
-    display:none;
-    opacity:0;
-    transform:translateY(10px);
-    transition:opacity .24s ease, transform .24s ease;
+  .stage{display:none}
+  .stage.active{display:block;animation:slam .28s ease}
+  @keyframes slam{
+    0%{opacity:0;transform:translateY(14px) scale(.995)}
+    100%{opacity:1;transform:none}
   }
-  .stage.active{
-    display:block;
-    opacity:1;
-    transform:translateY(0);
-  }
-  .grid{
-    display:grid;
-    grid-template-columns:1.2fr .8fr;
-    gap:16px;
-    min-height:620px;
-  }
-  .panel,.side{
-    background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:20px;
-    overflow:hidden;
-  }
-  .head{
-    padding:14px 16px;
-    border-bottom:1px solid rgba(255,255,255,.06);
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:10px;
-  }
-  .head .t{
-    text-transform:uppercase;
-    letter-spacing:.18em;
-    font-size:12px;
-    color:var(--cyan);
-  }
-  .head .d{margin-top:6px;color:var(--muted)}
-  .head .tag{font-size:12px;color:var(--yellow);padding-top:2px}
-  .content{padding:16px}
-  .board{
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr;
-    gap:12px;
-  }
-  .slot{
-    border-radius:18px;
-    min-height:134px;
-    background:linear-gradient(180deg,#192334,#121a25);
-    border:1px solid rgba(255,255,255,.08);
-    padding:14px;
-    position:relative;
-    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-  }
-  .slot:hover{
-    transform:translateY(-1px);
-    border-color:rgba(89,227,223,.22);
-    box-shadow:0 0 18px rgba(89,227,223,.08);
-  }
-  .slot .name{
-    font-size:18px;
-    font-weight:700;
-  }
-  .slot .meta{
-    position:absolute;
-    left:14px;
-    bottom:12px;
-    right:14px;
-    display:flex;
-    justify-content:space-between;
-    color:var(--muted);
-    font-size:12px;
-  }
-  .slot.hero{outline:2px solid rgba(89,227,223,.26)}
-  .slot.mission{outline:2px solid rgba(255,93,124,.24)}
-  .slot.delivery{outline:2px solid rgba(255,209,102,.24)}
-  .portrait{
-    width:54px;height:54px;border-radius:16px;
-    display:grid;place-items:center;
-    background:linear-gradient(180deg, rgba(89,227,223,.16), rgba(255,255,255,.04));
-    border:1px solid rgba(255,255,255,.08);
-    margin-bottom:10px;
-    font-size:22px;
-  }
-  .traits{
-    display:flex;flex-wrap:wrap;gap:8px;margin-top:12px
-  }
-  .chip{
-    font-size:11px;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    padding:7px 10px;
-    border-radius:999px;
-    border:1px solid rgba(255,255,255,.08);
-    background:rgba(255,255,255,.03);
-    color:var(--muted);
-  }
-  .dropzone{
-    margin-top:14px;
-    border:1px dashed rgba(89,227,223,.35);
-    border-radius:16px;
-    min-height:88px;
-    display:grid;
-    place-items:center;
-    color:var(--muted);
-    background:rgba(89,227,223,.04);
-    transition:background .18s ease, border-color .18s ease, box-shadow .18s ease;
-  }
-  .dropzone.dragover{
-    background:rgba(89,227,223,.12);
-    border-color:rgba(89,227,223,.78);
-    box-shadow:0 0 18px rgba(89,227,223,.15);
-  }
-  .hero-list,.mission-list{
-    display:grid;gap:10px;
-  }
+
+  .duo{display:grid;grid-template-columns:1.35fr .65fr;gap:16px;align-items:start}
   .card{
+    background:var(--panel);
+    border:1px solid var(--line);
     border-radius:16px;
-    padding:12px;
-    border:1px solid rgba(255,255,255,.08);
-    background:rgba(255,255,255,.03);
-    cursor:grab;
-    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
-  }
-  .card:hover{
-    transform:translateY(-1px);
-    border-color:rgba(89,227,223,.22);
-    box-shadow:0 0 16px rgba(89,227,223,.07);
-  }
-  .card:active{cursor:grabbing}
-  .card .row{display:flex;justify-content:space-between;gap:10px}
-  .card .title{font-weight:700}
-  .card .subt{color:var(--muted);margin-top:6px;font-size:13px;line-height:1.4}
-  .risk{
-    display:grid;gap:14px;
-  }
-  .meter{
-    height:34px;border-radius:999px;
-    background:#0b1017;border:1px solid rgba(255,255,255,.06);
     overflow:hidden;
   }
-  .meter > div{
-    width:62%;height:100%;
-    background:linear-gradient(90deg,var(--green),var(--yellow),var(--red));
+  .card > .hd{
+    display:flex;justify-content:space-between;align-items:baseline;gap:10px;
+    padding:13px 16px;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);
   }
-  .riskbox{
-    min-height:92px;
-    border-radius:18px;
-    background:linear-gradient(180deg,#192334,#121a25);
-    border:1px solid rgba(255,255,255,.08);
-    padding:14px;
-    transition:transform .18s ease, box-shadow .18s ease;
+  .card > .hd .t{
+    font-family:Anton,sans-serif;
+    font-size:16px;letter-spacing:.12em;text-transform:uppercase;
   }
-  .riskbox:hover{transform:translateY(-1px);box-shadow:0 0 18px rgba(89,227,223,.08)}
-  .call{
-    display:grid;gap:12px;
-  }
-  .callbox{
-    min-height:108px;
-    border-radius:18px;
-    background:linear-gradient(180deg,#192334,#121a25);
-    border:1px solid rgba(255,255,255,.08);
-    padding:14px;
-    display:flex;align-items:center;justify-content:space-between;gap:12px;
-  }
-  .count{
-    font-size:42px;
-    color:var(--yellow);
-    font-variant-numeric:tabular-nums;
-  }
-  .routing{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-  }
-  .route{
-    min-height:126px;
-    border-radius:18px;
-    background:linear-gradient(180deg,#192334,#121a25);
-    border:1px solid rgba(255,255,255,.08);
-    padding:14px;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-  }
-  .route .p{
-    height:12px;border-radius:999px;background:#0b1017;border:1px solid rgba(255,255,255,.06);overflow:hidden
-  }
-  .route .p > div{height:100%;width:75%;background:linear-gradient(90deg,var(--cyan),var(--green))}
-  .dialogue{
-    display:grid;gap:10px;
-  }
-  .choice{
-    border-radius:16px;
-    background:rgba(255,255,255,.03);
-    border:1px solid rgba(255,255,255,.08);
+  .card > .hd .k{font-size:13px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase}
+  .card > .bd{padding:16px}
+
+  .note{
+    background:var(--paper);
+    border:1px dashed #333c50;
+    border-radius:12px;
     padding:12px 14px;
-    transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    color:var(--muted);
+    line-height:1.5;
   }
-  .choice:hover{
-    transform:translateY(-1px);
-    border-color:rgba(89,227,223,.22);
-    box-shadow:0 0 16px rgba(89,227,223,.07);
-  }
-  .side{padding:16px;display:grid;gap:14px}
+  .note b{color:var(--text)}
+
   .feed{
     font-family:ui-monospace,Consolas,monospace;
-    background:#070b11;
-    border-radius:18px;
-    border:1px solid rgba(255,255,255,.06);
-    padding:14px;
-    line-height:1.65;
-    min-height:220px;
+    font-size:13.5px;
+    background:#07090e;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 14px;
+    line-height:1.7;
+    min-height:150px;
+    max-height:220px;
+    overflow:auto;
   }
+  .feed .o{color:var(--orange)}
   .feed .g{color:var(--green)}
-  .feed .c{color:var(--cyan)}
   .feed .r{color:var(--red)}
+  .feed .b{color:var(--blue)}
   .feed .y{color:var(--yellow)}
-  .mini{
-    border-radius:18px;
-    background:linear-gradient(180deg,#192334,#121a25);
-    border:1px solid rgba(255,255,255,.08);
-    padding:14px;
+
+  /* ============ dispatch map ============ */
+  .map{
+    position:relative;
+    height:430px;
+    border-radius:12px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    background:
+      linear-gradient(0deg, rgba(63,169,255,.03), rgba(63,169,255,.03)),
+      repeating-linear-gradient(0deg, transparent 0 46px, rgba(255,255,255,.045) 46px 48px),
+      repeating-linear-gradient(90deg, transparent 0 62px, rgba(255,255,255,.045) 62px 64px),
+      radial-gradient(circle at 70% 20%, #182033, #0c0f16 70%);
   }
-  .mini h3{margin:0 0 8px;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-  .mini p{margin:0;color:var(--text);line-height:1.55}
-  @media (max-width: 1100px){
-    .grid{grid-template-columns:1fr}
-    .stats{grid-template-columns:repeat(2,1fr)}
-    .board{grid-template-columns:1fr}
-    .routing{grid-template-columns:1fr}
+  .map .ave{
+    position:absolute;
+    background:rgba(255,255,255,.07);
+  }
+  .district{
+    position:absolute;
+    font-size:12px;
+    letter-spacing:.26em;
+    text-transform:uppercase;
+    color:#5b647c;
+  }
+  .call{
+    position:absolute;
+    width:74px;height:74px;
+    transform:translate(-50%,-50%);
+    background:none;border:none;padding:0;
+    cursor:pointer;
+  }
+  .call svg{position:absolute;inset:0;overflow:visible}
+  .call .ringbg{fill:none;stroke:rgba(255,255,255,.12);stroke-width:4}
+  .call .ring{
+    fill:none;stroke:var(--orange);stroke-width:4;stroke-linecap:round;
+    transform:rotate(-90deg);transform-origin:center;
+    animation:drain 26s linear infinite;
+  }
+  @keyframes drain{from{stroke-dashoffset:0}to{stroke-dashoffset:207}}
+  .call .core{
+    position:absolute;inset:17px;
+    border-radius:50%;
+    display:grid;place-items:center;
+    font-size:20px;
+    background:radial-gradient(circle at 34% 30%, #232c40, #10141d);
+    border:1px solid #39445e;
+    transition:box-shadow .15s ease, border-color .15s ease;
+  }
+  .call:hover .core{border-color:var(--orange)}
+  .call.sel .core{
+    border-color:var(--orange);
+    box-shadow:0 0 0 4px rgba(255,138,42,.22), 0 0 30px rgba(255,138,42,.4);
+  }
+  .call.done{opacity:.35;pointer-events:none}
+  .call.done .ring{animation:none;stroke:var(--green)}
+  .call .tag{
+    position:absolute;left:50%;top:calc(100% + 2px);
+    transform:translateX(-50%);
+    white-space:nowrap;
+    font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  }
+
+  .roster{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+  .heroCard{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:10px 12px;
+    display:flex;gap:10px;align-items:center;
+    cursor:pointer;
+    transition:all .14s ease;
+  }
+  .heroCard:hover{transform:translateY(-2px);border-color:#3a4560}
+  .heroCard.sel{border-color:var(--blue);box-shadow:0 0 0 3px rgba(63,169,255,.18)}
+  .heroCard.out{opacity:.4;pointer-events:none}
+  .heroCard .nm{font-family:Anton,sans-serif;font-size:15px;letter-spacing:.08em}
+  .heroCard .rl{font-size:12px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+  .brief .req{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .skillchip{
+    font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;
+    border:1px solid var(--line);
+    background:#10141d;
+    border-radius:999px;
+    padding:6px 11px;
+    color:var(--muted);
+  }
+  .skillchip b{color:var(--yellow);margin-left:5px}
+  .go{
+    margin-top:14px;
+    width:100%;
+    font-family:Anton,sans-serif;
+    font-size:16px;letter-spacing:.14em;text-transform:uppercase;
+    color:#0b0d12;
+    background:var(--orange);
+    border:none;border-radius:8px;
+    padding:13px;
+    cursor:pointer;
+    transition:filter .15s ease, transform .15s ease;
+  }
+  .go:hover{filter:brightness(1.08);transform:translateY(-1px)}
+  .go:disabled{filter:grayscale(1) brightness(.6);cursor:not-allowed;transform:none}
+
+  /* ============ hacking ============ */
+  .hackbar{
+    height:14px;border-radius:999px;
+    background:#0a0c11;border:1px solid var(--line);
+    overflow:hidden;margin-bottom:12px;
+  }
+  .hackbar > div{
+    height:100%;width:100%;
+    background:linear-gradient(90deg,var(--orange),var(--amber));
+    box-shadow:0 0 18px rgba(255,138,42,.5);
+    transition:width .18s linear;
+  }
+  .hackwrapper{position:relative}
+  .hackframe{
+    background:
+      radial-gradient(circle at 50% 0%, rgba(63,169,255,.05), transparent 46%),
+      #0a0d13;
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+  }
+  .hackframe svg{display:block;width:100%;height:auto}
+  .trace{stroke:#2c3750;stroke-width:5;stroke-linecap:round}
+  .trace.lit{stroke:#3fa9ff55}
+  .gapline{stroke:var(--orange);stroke-width:4;stroke-dasharray:6 8;stroke-linecap:round}
+  .gapline.built{stroke:var(--blue);stroke-dasharray:none}
+  .nd{fill:#161c2a;stroke:#3a465f;stroke-width:2}
+  .nd.visited{stroke:#3fa9ff88}
+  .exitHex{
+    fill:rgba(73,224,107,.14);
+    stroke:var(--green);stroke-width:3;
+    filter:drop-shadow(0 0 10px rgba(73,224,107,.5));
+    animation:hexPulse 1.6s ease-in-out infinite;
+  }
+  @keyframes hexPulse{0%,100%{opacity:.85}50%{opacity:1}}
+  .avatar{
+    fill:var(--blue);
+    filter:drop-shadow(0 0 8px rgba(63,169,255,.9));
+    transition:transform .16s ease;
+  }
+  .avatar.charged{fill:var(--yellow);filter:drop-shadow(0 0 10px rgba(255,209,102,.9))}
+  .avring{fill:none;stroke:rgba(63,169,255,.5);stroke-width:2;transition:transform .16s ease}
+  .virus{
+    fill:var(--red);
+    filter:drop-shadow(0 0 9px rgba(255,59,87,.85));
+    transition:transform .34s ease;
+  }
+  .icoTxt{font-size:15px;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+  .lockedGlyph{fill:var(--red)}
+  .hackfoot{
+    display:flex;justify-content:space-between;align-items:center;
+    gap:12px;margin-top:12px;flex-wrap:wrap;
+  }
+  .dpad{display:grid;grid-template-columns:repeat(3,46px);grid-auto-rows:46px;gap:6px}
+  .dpad button{
+    border:1px solid var(--line);
+    background:#10141d;color:var(--text);
+    border-radius:10px;font-size:18px;cursor:pointer;
+    transition:all .12s ease;
+  }
+  .dpad button:hover{border-color:var(--blue);color:var(--blue)}
+  .dpad .blank{visibility:hidden}
+  .hackstat{display:flex;gap:10px;flex-wrap:wrap}
+  .pill{
+    font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;
+    border:1px solid var(--line);border-radius:999px;
+    padding:7px 12px;color:var(--muted);
+  }
+  .pill.on{color:var(--green);border-color:rgba(73,224,107,.5)}
+  .reset{
+    font-family:Anton,sans-serif;font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+    background:none;border:1px solid var(--line);color:var(--muted);
+    border-radius:8px;padding:11px 16px;cursor:pointer;
+  }
+  .reset:hover{color:var(--text);border-color:#3a445c}
+
+  /* hack overlays */
+  .hackover{
+    position:absolute;inset:0;
+    display:none;
+    align-items:center;justify-content:center;
+    background:rgba(7,9,14,.82);
+    backdrop-filter:blur(3px);
+    border-radius:12px;
+    z-index:5;
+  }
+  .hackover.on{display:flex}
+  .qtebox{
+    text-align:center;
+    background:#12151d;
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:26px 34px;
+    box-shadow:0 20px 60px rgba(0,0,0,.6);
+  }
+  .qtebox .t{font-family:Anton,sans-serif;font-size:22px;letter-spacing:.1em;text-transform:uppercase}
+  .qtebox .t .hammer{color:var(--orange)}
+  .seq{display:flex;gap:10px;justify-content:center;margin:18px 0 6px}
+  .key{
+    width:54px;height:54px;
+    display:grid;place-items:center;
+    font-size:24px;
+    border-radius:10px;
+    border:2px solid var(--line);
+    background:#0d1017;
+    color:var(--muted);
+    transition:all .12s ease;
+  }
+  .key.hit{border-color:var(--green);color:var(--green);box-shadow:0 0 14px rgba(73,224,107,.35)}
+  .key.now{border-color:var(--orange);color:var(--text);animation:blink .6s ease-in-out infinite}
+  @keyframes blink{50%{box-shadow:0 0 16px rgba(255,138,42,.55)}}
+  .qtebox .hint{color:var(--muted);font-size:14px;margin-top:8px}
+  .bigmsg{
+    text-align:center;
+  }
+  .bigmsg .h{
+    font-family:Anton,sans-serif;
+    font-size:clamp(34px,4.6vw,54px);
+    letter-spacing:.06em;text-transform:uppercase;
+  }
+  .bigmsg .h.win{color:var(--green);text-shadow:0 0 34px rgba(73,224,107,.5)}
+  .bigmsg .h.lose{color:var(--red);text-shadow:0 0 34px rgba(255,59,87,.5)}
+  .bigmsg .s{color:var(--muted);margin-top:8px}
+  .bigmsg button{margin-top:18px}
+
+  /* ============ pentagon report ============ */
+  .pentawrap{display:grid;place-items:center;padding:8px 0}
+  .axisLbl{
+    font-family:Anton,sans-serif;font-size:13px;letter-spacing:.1em;
+    fill:var(--muted);text-anchor:middle;text-transform:uppercase;
+  }
+  .pgrid{fill:none;stroke:#232b3d;stroke-width:1}
+  .pReq{fill:rgba(255,138,42,.10);stroke:var(--orange);stroke-width:2;stroke-dasharray:7 5}
+  .pHero{fill:rgba(63,169,255,.22);stroke:var(--blue);stroke-width:2.5}
+  .legend{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+  .legend .li{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px;letter-spacing:.06em;text-transform:uppercase}
+  .sw{width:22px;height:12px;border-radius:3px}
+  .accuracy{
+    text-align:center;margin-top:14px;
+    font-family:Anton,sans-serif;font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+  }
+  .accuracy b{font-size:34px;color:var(--yellow);display:block;margin-top:2px}
+
+  .mini-pent{flex-shrink:0}
+
+  .foot{
+    padding:14px 20px 18px;
+    border-top:1px solid var(--line);
+    color:#586178;
+    font-size:13px;
+    letter-spacing:.06em;
+    line-height:1.5;
+  }
+
+  @media (max-width: 1080px){
+    .duo{grid-template-columns:1fr}
+    .roster{grid-template-columns:repeat(2,1fr)}
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="shell">
-    <div class="top">
+  <div class="console">
+    <div class="masthead">
       <div>
-        <div class="brand">Dispatch Style Prototype</div>
-        <h1>Hero Operations Center</h1>
-        <div class="sub">Comic-book management interface with five original mini-games</div>
+        <div class="stamp">Night Shift // Console 07</div>
+        <h1>Dispatch <span class="pop">Minigame</span> Study</h1>
+        <div class="sub">A UI recreation of the three minigame systems from <b>Dispatch</b> (AdHoc Studio): the timed city dispatch map, the node-maze hacking puzzle, and directional-input bridge QTEs. Original art and code — no game assets used.</div>
       </div>
-      <div class="clock">00:42</div>
+      <div class="shiftcard">
+        <div class="lbl">Shift Clock</div>
+        <div class="t" id="shiftClock">23:41</div>
+      </div>
+    </div>
+    <div class="shiftbar"><div id="shiftFill"></div></div>
+
+    <div class="deck">
+      <div class="tabs" role="tablist" aria-label="Minigames">
+        <button class="tab active" data-tab="map"><span>Dispatch Map</span></button>
+        <button class="tab" data-tab="hack"><span>Hacking</span></button>
+        <button class="tab" data-tab="qte"><span>Bridge QTE</span></button>
+        <button class="tab" data-tab="report"><span>Skill Report</span></button>
+      </div>
+
+      <!-- ================= DISPATCH MAP ================= -->
+      <section class="stage active" id="map">
+        <div class="duo">
+          <div class="card">
+            <div class="hd"><div class="t">City Grid — Los Angeles</div><div class="k" id="mapStatus">3 open calls</div></div>
+            <div class="bd">
+              <div class="map" id="cityMap">
+                <div class="ave" style="left:0;right:0;top:31%;height:3px"></div>
+                <div class="ave" style="left:0;right:0;top:64%;height:3px"></div>
+                <div class="ave" style="top:0;bottom:0;left:24%;width:3px"></div>
+                <div class="ave" style="top:0;bottom:0;left:55%;width:3px;transform:skewX(-14deg)"></div>
+                <div class="ave" style="top:0;bottom:0;left:80%;width:3px"></div>
+                <div class="district" style="left:6%;top:8%">Echo Park</div>
+                <div class="district" style="left:60%;top:12%">Downtown</div>
+                <div class="district" style="left:84%;top:44%">Boyle Hts</div>
+                <div class="district" style="left:8%;top:82%">Harbor</div>
+                <div class="district" style="left:60%;top:84%">Vernon</div>
+              </div>
+              <div class="roster" id="roster"></div>
+            </div>
+          </div>
+          <div class="card brief">
+            <div class="hd"><div class="t">Call Briefing</div><div class="k">time paused</div></div>
+            <div class="bd">
+              <div class="note" id="briefText"><b>No call selected.</b> Click a pulsing incident ring on the map. Time pauses while you read the briefing — but the ring keeps its countdown when you close it.</div>
+              <div class="req" id="briefReq"></div>
+              <button class="go" id="sendBtn" disabled>Dispatch Hero</button>
+              <div style="height:14px"></div>
+              <div class="feed" id="mapFeed">
+                <div><span class="o">&gt; SDN uplink</span> established</div>
+                <div><span class="b">&gt; roster</span> 4 heroes on shift</div>
+                <div>&gt; awaiting call selection…</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= HACKING ================= -->
+      <section class="stage" id="hack">
+        <div class="duo">
+          <div class="card">
+            <div class="hd"><div class="t">Breach — Node Maze</div><div class="k">arrow keys / d-pad</div></div>
+            <div class="bd">
+              <div class="hackbar"><div id="hackFill"></div></div>
+              <div class="hackwrapper">
+                <div class="hackframe"><svg id="hackSvg" viewBox="0 0 780 440" role="img" aria-label="Hacking node maze"></svg></div>
+
+                <div class="hackover" id="bridgeOver">
+                  <div class="qtebox">
+                    <div class="t"><span class="hammer">⚒</span> Build Bridge</div>
+                    <div class="seq" id="bridgeSeq"></div>
+                    <div class="hint">Tap the arrow sequence. A wrong key resets the pattern.</div>
+                  </div>
+                </div>
+
+                <div class="hackover" id="endOver">
+                  <div class="bigmsg">
+                    <div class="h win" id="endH">Access Granted</div>
+                    <div class="s" id="endS">Node breached with 0:31 on the trace.</div>
+                    <button class="go" style="width:auto;padding:12px 26px" onclick="hackReset()">Run It Again</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hackfoot">
+                <div class="dpad">
+                  <span class="blank"></span><button onclick="hackMove(0,-1)" aria-label="Up">↑</button><span class="blank"></span>
+                  <button onclick="hackMove(-1,0)" aria-label="Left">←</button><button onclick="hackMove(0,1)" aria-label="Down">↓</button><button onclick="hackMove(1,0)" aria-label="Right">→</button>
+                </div>
+                <div class="hackstat">
+                  <span class="pill" id="pillPass">🔑 password</span>
+                  <span class="pill" id="pillCharge">⚡ charge</span>
+                  <span class="pill" id="pillBridge">⚒ bridge</span>
+                </div>
+                <button class="reset" onclick="hackReset()">Reset Run</button>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="hd"><div class="t">Field Notes</div><div class="k">how it works</div></div>
+            <div class="bd" style="display:grid;gap:12px">
+              <div class="note"><b style="color:var(--green)">⬡ Green hexagon</b> is the exit. Reach it before the orange trace bar drains.</div>
+              <div class="note"><b style="color:var(--orange)">⚒ Hammer gap</b> — step into it to trigger a bridge QTE: tap the shown arrow sequence to span the gap.</div>
+              <div class="note"><b style="color:var(--red)">◆ Antivirus</b> patrols the far zone and steps every time you do. Contact kicks you back to entry and burns trace time.</div>
+              <div class="note"><b style="color:var(--yellow)">⚡ Battery</b> charges your avatar; carry it into the dead <b>▣ gate</b> to power it. <b style="color:var(--red)">🔒 Lock</b> opens only after you touch the <b>PW</b> node.</div>
+              <div class="feed" id="hackFeed">
+                <div><span class="b">&gt; avatar</span> injected at entry node</div>
+                <div>&gt; two routes to the exit — pick your poison</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= BRIDGE QTE ================= -->
+      <section class="stage" id="qte">
+        <div class="duo">
+          <div class="card">
+            <div class="hd"><div class="t">QTE Trainer</div><div class="k">arrow keys</div></div>
+            <div class="bd" style="text-align:center;padding:34px 16px">
+              <div class="qtebox" style="display:inline-block">
+                <div class="t"><span class="hammer">⚒</span> Sequence <span id="qteRound" style="color:var(--yellow)">01</span></div>
+                <div class="seq" id="qteSeq"></div>
+                <div class="hint" id="qteHint">Press START, then tap the arrows in order before the pattern resets you.</div>
+              </div>
+              <div style="height:22px"></div>
+              <button class="go" style="width:auto;padding:13px 34px" id="qteStart">Start</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="hd"><div class="t">Streak</div><div class="k">no misses</div></div>
+            <div class="bd" style="display:grid;gap:12px">
+              <div class="accuracy">Current streak<b id="qteStreak">0</b></div>
+              <div class="accuracy">Best<b id="qteBest" style="color:var(--green)">0</b></div>
+              <div class="note">In-game, these direction taps fire during hacking gaps and cinematic beats. The prompt should read instantly: big glyph, orange focus state, hard reset on a miss.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SKILL REPORT ================= -->
+      <section class="stage" id="report">
+        <div class="duo">
+          <div class="card">
+            <div class="hd"><div class="t">Post-Call Skill Pentagon</div><div class="k" id="reportWho">sample data</div></div>
+            <div class="bd">
+              <div class="pentawrap">
+                <svg id="pentSvg" width="420" height="380" viewBox="0 0 420 380"></svg>
+              </div>
+              <div class="legend">
+                <div class="li"><span class="sw" style="background:rgba(255,138,42,.5);outline:2px dashed var(--orange)"></span>Call required</div>
+                <div class="li"><span class="sw" style="background:rgba(63,169,255,.55)"></span>Hero delivered</div>
+              </div>
+              <div class="accuracy">Dispatch accuracy<b id="accVal">—</b></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="hd"><div class="t">Reading It</div><div class="k">com·vig·mob·cha·int</div></div>
+            <div class="bd" style="display:grid;gap:12px">
+              <div class="note">After every resolved call the five skills — <b>Combat, Vigour, Mobility, Charisma, Intellect</b> — plot as a pentagon. The dashed orange shape is what the call demanded; the filled blue shape is what your hero brought.</div>
+              <div class="note">Blue spilling past orange = wasted muscle. Orange poking out past blue = the deficit that made the call go sideways. Send someone from the <b>Dispatch Map</b> tab and this chart updates with the real match-up.</div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
-    <div class="main">
-      <div class="stats">
-        <div class="stat"><label>City Risk</label><strong style="color:var(--red)">67%</strong></div>
-        <div class="stat"><label>Team Morale</label><strong style="color:var(--cyan)">42%</strong></div>
-        <div class="stat"><label>Power Cells</label><strong style="color:var(--green)">8</strong></div>
-        <div class="stat"><label>Active Calls</label><strong>3</strong></div>
-      </div>
-
-      <div class="bar"><div></div></div>
-
-      <div class="tabs" role="tablist" aria-label="Mini games">
-        <button class="tab active" data-tab="assign">Assignment Board</button>
-        <button class="tab" data-tab="risk">Risk Meter</button>
-        <button class="tab" data-tab="call">Emergency Call</button>
-        <button class="tab" data-tab="route">Resource Routing</button>
-        <button class="tab" data-tab="dialogue">Dialogue Choice</button>
-      </div>
-
-      <section class="stage active" id="assign">
-        <div class="grid">
-          <div class="panel">
-            <div class="head">
-              <div><div class="t">Assignment Board</div><div class="d">Drag heroes to emergencies, chores, and deliveries</div></div>
-              <div class="tag">Operations</div>
-            </div>
-            <div class="content">
-              <div class="board">
-                <div class="slot hero">
-                  <div class="portrait">A</div>
-                  <div class="name">Aster</div>
-                  <div class="sub">Speed / Rescue / Improvisation</div>
-                  <div class="traits"><span class="chip">Fast</span><span class="chip">Bright</span><span class="chip">Risky</span></div>
-                  <div class="dropzone">Drop mission here</div>
-                </div>
-                <div class="slot hero">
-                  <div class="portrait">B</div>
-                  <div class="name">Bolt</div>
-                  <div class="sub">Power / Shield / Crowd Control</div>
-                  <div class="traits"><span class="chip">Strong</span><span class="chip">Steady</span><span class="chip">Loud</span></div>
-                  <div class="dropzone">Drop mission here</div>
-                </div>
-                <div class="slot hero">
-                  <div class="portrait">M</div>
-                  <div class="name">Mira</div>
-                  <div class="sub">Tech / Scan / Clean-up</div>
-                  <div class="traits"><span class="chip">Smart</span><span class="chip">Precise</span><span class="chip">Calm</span></div>
-                  <div class="dropzone">Drop mission here</div>
-                </div>
-              </div>
-
-              <div style="height:14px"></div>
-
-              <div class="board">
-                <div class="slot mission" draggable="true" data-task="Fire at harbor" data-type="emergency">
-                  <div class="name">Fire at harbor</div>
-                  <div class="subt">Civilians trapped, time limit 02:00, heat hazard high.</div>
-                  <div class="meta"><span>Emergency</span><span>+30 reward</span></div>
-                </div>
-                <div class="slot delivery" draggable="true" data-task="Replace power cells" data-type="delivery">
-                  <div class="name">Replace power cells</div>
-                  <div class="subt">Routine delivery to downtown grid. Needs accuracy, not brute force.</div>
-                  <div class="meta"><span>Delivery</span><span>+12 reward</span></div>
-                </div>
-                <div class="slot mission" draggable="true" data-task="Cat rescue on roof" data-type="chore">
-                  <div class="name">Cat rescue on roof</div>
-                  <div class="subt">Low threat, high public visibility, must keep morale up.</div>
-                  <div class="meta"><span>Chore</span><span>+5 reward</span></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="side">
-            <div class="mini">
-              <h3>How it plays</h3>
-              <p>Pick a mission card and drag it onto a hero to assign the job. The board is designed like an in-office dispatch table with comic-book energy.</p>
-            </div>
-            <div class="feed">
-              <div><span class="g">&gt; Aster</span> ready for fast response</div>
-              <div><span class="c">&gt; Bolt</span> best for heavy threats</div>
-              <div><span class="y">&gt; Mira</span> boosts efficiency and cleanup</div>
-              <div><span class="r">&gt; Fire at harbor</span> active, countdown running</div>
-              <div>&gt; <span class="c">drag mission to hero slot</span></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="stage" id="risk">
-        <div class="grid">
-          <div class="panel">
-            <div class="head">
-              <div><div class="t">Risk Meter</div><div class="d">Balance hero traits against mission threat levels</div></div>
-              <div class="tag">Threat Eval</div>
-            </div>
-            <div class="content risk">
-              <div class="riskbox">
-                <div style="display:flex;justify-content:space-between;gap:12px;align-items:center">
-                  <div>
-                    <div class="t">Current Match</div>
-                    <div class="name" style="font-size:22px;margin-top:6px">Bolt vs. Armored Riot</div>
-                  </div>
-                  <div style="font-size:38px;color:var(--yellow)">78</div>
-                </div>
-                <div style="height:10px"></div>
-                <div class="meter"><div></div></div>
-                <div style="height:10px"></div>
-                <div class="sub">Too much threat pushes the bar red. Strong match-ups keep the mission in the safe zone.</div>
-              </div>
-
-              <div class="board">
-                <div class="slot hero">
-                  <div class="name">Trait boosts</div>
-                  <div class="traits"><span class="chip">Shield +20</span><span class="chip">Crowd +15</span><span class="chip">Speed +5</span></div>
-                </div>
-                <div class="slot mission">
-                  <div class="name">Threat types</div>
-                  <div class="traits"><span class="chip">Armor</span><span class="chip">Heat</span><span class="chip">Chaos</span></div>
-                </div>
-                <div class="slot delivery">
-                  <div class="name">Best result</div>
-                  <div class="subt">Match the hero with the strongest trait advantage to reduce damage and failure chance.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="side">
-            <div class="mini">
-              <h3>System note</h3>
-              <p>Use the meter like a comic-book danger gauge. Green means clean deployment, yellow means caution, red means bad odds.</p>
-            </div>
-            <div class="feed">
-              <div><span class="g">&gt; advantage</span> detected: shield vs armor</div>
-              <div><span class="y">&gt; caution</span> if mission adds heat</div>
-              <div><span class="r">&gt; failure</span> chance rises if mismatched</div>
-              <div>&gt; keep the meter below <span class="c">80%</span></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="stage" id="call">
-        <div class="grid">
-          <div class="panel">
-            <div class="head">
-              <div><div class="t">Emergency Call</div><div class="d">Respond before the timer expires</div></div>
-              <div class="tag">00:12</div>
-            </div>
-            <div class="content call">
-              <div class="callbox">
-                <div>
-                  <div class="t">Incoming</div>
-                  <div class="name" style="font-size:22px;margin-top:6px">Bank alarm in Midtown</div>
-                  <div class="sub">Choose response: stealth, brute force, or fast extraction</div>
-                </div>
-                <div class="count">12</div>
-              </div>
-              <div class="board">
-                <div class="slot mission">
-                  <div class="name">Response A</div>
-                  <div class="subt">Send Bolt for direct intervention. Higher risk, faster resolution.</div>
-                </div>
-                <div class="slot delivery">
-                  <div class="name">Response B</div>
-                  <div class="subt">Send Mira for scan and control. Safer, but slower.</div>
-                </div>
-                <div class="slot hero">
-                  <div class="name">Response C</div>
-                  <div class="subt">Send Aster for extraction. Best if civilians are trapped.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="side">
-            <div class="mini">
-              <h3>Prompt feel</h3>
-              <p>This one should feel urgent and readable, like a television cut-in with a countdown and a clear choice.</p>
-            </div>
-            <div class="feed">
-              <div><span class="r">&gt; alarm</span> triggered in sector 4</div>
-              <div><span class="y">&gt; timer</span> approaching zero</div>
-              <div><span class="c">&gt; choose hero</span> before escalation</div>
-              <div>&gt; <span class="g">quick decisions matter</span></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="stage" id="route">
-        <div class="grid">
-          <div class="panel">
-            <div class="head">
-              <div><div class="t">Resource Routing</div><div class="d">Manage power, cooldowns, and team coverage</div></div>
-              <div class="tag">Supply Grid</div>
-            </div>
-            <div class="content">
-              <div class="routing">
-                <div class="route">
-                  <div><div class="t">Power Allocation</div><div class="sub">Budget three power cells across active missions.</div></div>
-                  <div class="p"><div></div></div>
-                </div>
-                <div class="route">
-                  <div><div class="t">Cooldown Sync</div><div class="sub">Rotate exhausted heroes back into reserve.</div></div>
-                  <div class="p"><div style="width:48%;background:linear-gradient(90deg,var(--orange),var(--yellow))"></div></div>
-                </div>
-                <div class="route">
-                  <div><div class="t">Coverage Map</div><div class="sub">Keep all city sectors staffed.</div></div>
-                  <div class="p"><div style="width:84%;background:linear-gradient(90deg,var(--cyan2),var(--green))"></div></div>
-                </div>
-                <div class="route">
-                  <div><div class="t">Reserve Pool</div><div class="sub">Hold one hero back for emergencies.</div></div>
-                  <div class="p"><div style="width:26%;background:linear-gradient(90deg,var(--red),var(--orange))"></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="side">
-            <div class="mini">
-              <h3>Routing feel</h3>
-              <p>This mini-game works best as a simple planning puzzle: where do you spend the limited battery, and when do you save power for later?</p>
-            </div>
-            <div class="feed">
-              <div><span class="g">&gt; power</span> cells available: 8</div>
-              <div><span class="c">&gt; reserve</span> hero recommended</div>
-              <div><span class="y">&gt; cooldown</span> management active</div>
-              <div>&gt; coverage gaps raise city risk</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="stage" id="dialogue">
-        <div class="grid">
-          <div class="panel">
-            <div class="head">
-              <div><div class="t">Dialogue Choice</div><div class="d">Handle office banter and story moments</div></div>
-              <div class="tag">Branching Talk</div>
-            </div>
-            <div class="content dialogue">
-              <div class="callbox">
-                <div>
-                  <div class="t">Scene</div>
-                  <div class="name" style="font-size:22px;margin-top:6px">The team wants an explanation</div>
-                  <div class="sub">Choose your tone carefully. Morale changes based on your answer.</div>
-                </div>
-                <div class="portrait" style="margin:0">R</div>
-              </div>
-              <div class="choice">
-                <div class="name">Option 1: Keep it professional</div>
-                <div class="subt">“We focus on the mission first. Questions later.”</div>
-              </div>
-              <div class="choice">
-                <div class="name">Option 2: Joke it off</div>
-                <div class="subt">“If you all survive this shift, I’ll explain everything.”</div>
-              </div>
-              <div class="choice">
-                <div class="name">Option 3: Be honest</div>
-                <div class="subt">“Things are worse than I said, but I trust you to handle it.”</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="side">
-            <div class="mini">
-              <h3>Dialogue feel</h3>
-              <p>Make this one look like comic-book cutscene choices: readable, bold, and emotionally clear.</p>
-            </div>
-            <div class="feed">
-              <div><span class="c">&gt; morale</span> can rise or fall</div>
-              <div><span class="y">&gt; trust</span> affects future missions</div>
-              <div><span class="g">&gt; humor</span> can calm the team</div>
-              <div>&gt; story choices change relationships</div>
-            </div>
-          </div>
-        </div>
-      </section>
+    <div class="foot">
+      Fan-made UI study inspired by the minigames in <b>Dispatch</b> (AdHoc Studio, 2025). Recreated from scratch for design reference — not affiliated with or endorsed by AdHoc Studio; no original game assets, art, or text are used.
     </div>
   </div>
 </div>
 
 <script>
+/* ---------- tabs ---------- */
 const tabs = document.querySelectorAll('.tab');
 const stages = document.querySelectorAll('.stage');
-const missionCards = document.querySelectorAll('.slot[draggable="true"]');
-const dropZones = document.querySelectorAll('.dropzone');
-const state = {
-  assignments: {},
-  risk: 67,
-  morale: 42,
-  power: 8
-};
-
+let activeTab = 'map';
 tabs.forEach(tab => {
   tab.addEventListener('click', () => {
     tabs.forEach(t => t.classList.remove('active'));
     stages.forEach(s => s.classList.remove('active'));
     tab.classList.add('active');
-    document.getElementById(tab.dataset.tab).classList.add('active');
+    activeTab = tab.dataset.tab;
+    document.getElementById(activeTab).classList.add('active');
   });
 });
 
-missionCards.forEach(card => {
-  card.addEventListener('dragstart', e => {
-    e.dataTransfer.setData('text/plain', card.dataset.task);
-    e.dataTransfer.effectAllowed = 'move';
-    card.classList.add('dragging');
-  });
+/* ---------- shift clock ---------- */
+(function(){
+  let m = 23, s = 41;
+  setInterval(() => {
+    s++; if (s > 59){ s = 0; m = (m + 1) % 24; }
+    document.getElementById('shiftClock').textContent =
+      String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  }, 1000);
+})();
 
-  card.addEventListener('dragend', () => {
-    card.classList.remove('dragging');
-  });
+/* ---------- shared: pentagon helpers ---------- */
+const SKILLS = ['combat','vigour','mobility','charisma','intellect'];
+const SKILL_ABBR = ['COM','VIG','MOB','CHA','INT'];
+function pentPoints(cx, cy, r, stats){
+  return SKILLS.map((k,i) => {
+    const a = -Math.PI/2 + i * (Math.PI*2/5);
+    const rr = r * (stats[k]/10);
+    return (cx + rr*Math.cos(a)).toFixed(1) + ',' + (cy + rr*Math.sin(a)).toFixed(1);
+  }).join(' ');
+}
+function fullPent(cx, cy, r){
+  return pentPoints(cx, cy, r, {combat:10,vigour:10,mobility:10,charisma:10,intellect:10});
+}
+function miniPent(stats, color){
+  const s = 54, c = s/2, r = 22;
+  return `<svg class="mini-pent" width="${s}" height="${s}" viewBox="0 0 ${s} ${s}">
+    <polygon points="${fullPent(c,c,r)}" fill="none" stroke="#2a3245" stroke-width="1"/>
+    <polygon points="${pentPoints(c,c,r,stats)}" fill="${color}44" stroke="${color}" stroke-width="1.6"/>
+  </svg>`;
+}
+
+/* ---------- dispatch map ---------- */
+const heroes = [
+  { name:'SLEDGE',  role:'Wrecker',   color:'#ff8a2a', stats:{combat:9,vigour:8,mobility:2,charisma:2,intellect:3} },
+  { name:'WISP',    role:'Runner',    color:'#3fa9ff', stats:{combat:3,vigour:4,mobility:9,charisma:4,intellect:5} },
+  { name:'HALO',    role:'Face',      color:'#ffd166', stats:{combat:2,vigour:3,mobility:4,charisma:9,intellect:6} },
+  { name:'CIRCUIT', role:'Analyst',   color:'#49e06b', stats:{combat:4,vigour:5,mobility:5,charisma:3,intellect:9} },
+];
+const calls = [
+  { id:'c1', icon:'🚨', name:'Armored truck heist', dist:'Downtown', x:63, y:36,
+    brief:'Two supers cracking a transport open on 5th. Needs someone who hits like a demolition permit.',
+    req:{combat:8,vigour:6,mobility:4,charisma:1,intellect:2} },
+  { id:'c2', icon:'🔥', name:'Chemical fire', dist:'Harbor', x:27, y:72,
+    brief:'Storage tank venting something green. Needs endurance and enough brains not to breathe it.',
+    req:{combat:2,vigour:8,mobility:6,charisma:1,intellect:5} },
+  { id:'c3', icon:'🗣️', name:'Rooftop standoff', dist:'Echo Park', x:38, y:20,
+    brief:'A scared kid with borrowed powers on a ledge. Send a voice, not a fist.',
+    req:{combat:1,vigour:2,mobility:5,charisma:9,intellect:3} },
+];
+let selCall = null, selHero = null, openCalls = calls.length;
+
+const mapEl = document.getElementById('cityMap');
+calls.forEach(c => {
+  const b = document.createElement('button');
+  b.className = 'call'; b.id = 'call_' + c.id;
+  b.innerHTML = `
+    <svg viewBox="0 0 74 74">
+      <circle class="ringbg" cx="37" cy="37" r="33"/>
+      <circle class="ring" cx="37" cy="37" r="33" stroke-dasharray="207" stroke-dashoffset="0"/>
+    </svg>
+    <span class="core">${c.icon}</span>
+    <span class="tag">${c.dist}</span>`;
+  b.style.left = c.x + '%';
+  b.style.top = c.y + '%';
+  b.addEventListener('click', () => selectCall(c));
+  mapEl.appendChild(b);
 });
 
-dropZones.forEach(zone => {
-  zone.addEventListener('dragover', e => {
-    e.preventDefault();
-    zone.classList.add('dragover');
-    e.dataTransfer.dropEffect = 'move';
-  });
-
-  zone.addEventListener('dragleave', () => {
-    zone.classList.remove('dragover');
-  });
-
-  zone.addEventListener('drop', e => {
-    e.preventDefault();
-    zone.classList.remove('dragover');
-
-    const task = e.dataTransfer.getData('text/plain');
-    if (!task) return;
-
-    const heroCard = zone.closest('.slot.hero');
-    const heroName = heroCard?.querySelector('.name')?.textContent || 'Hero';
-
-    zone.textContent = `Assigned: ${task}`;
-    zone.style.fontWeight = '700';
-    zone.style.color = 'var(--text)';
-
-    state.assignments[heroName] = task;
-    applyAssignmentEffects(task, heroName, heroCard);
-    renderFeed(task, heroName);
-  });
+const rosterEl = document.getElementById('roster');
+heroes.forEach(h => {
+  const d = document.createElement('div');
+  d.className = 'heroCard'; d.id = 'hero_' + h.name;
+  d.innerHTML = miniPent(h.stats, h.color) +
+    `<div><div class="nm" style="color:${h.color}">${h.name}</div><div class="rl">${h.role}</div></div>`;
+  d.addEventListener('click', () => selectHero(h));
+  rosterEl.appendChild(d);
 });
 
-function applyAssignmentEffects(task, heroName, heroCard) {
-  const text = task.toLowerCase();
-  let riskDelta = 0;
-  let moraleDelta = 0;
+function selectCall(c){
+  selCall = c;
+  document.querySelectorAll('.call').forEach(el => el.classList.remove('sel'));
+  document.getElementById('call_' + c.id).classList.add('sel');
+  document.getElementById('briefText').innerHTML = `<b>${c.name} — ${c.dist}.</b> ${c.brief}`;
+  document.getElementById('briefReq').innerHTML = SKILLS.map((k,i) =>
+    `<span class="skillchip">${SKILL_ABBR[i]}<b>${c.req[k]}</b></span>`).join('');
+  syncSend();
+}
+function selectHero(h){
+  selHero = h;
+  document.querySelectorAll('.heroCard').forEach(el => el.classList.remove('sel'));
+  document.getElementById('hero_' + h.name).classList.add('sel');
+  syncSend();
+}
+function syncSend(){
+  const btn = document.getElementById('sendBtn');
+  btn.disabled = !(selCall && selHero);
+  btn.textContent = (selCall && selHero) ? `Dispatch ${selHero.name}` : 'Dispatch Hero';
+}
+document.getElementById('sendBtn').addEventListener('click', () => {
+  if (!selCall || !selHero) return;
+  const deficit = SKILLS.reduce((t,k) => t + Math.max(0, selCall.req[k] - selHero.stats[k]), 0);
+  const acc = Math.max(4, Math.min(99, 100 - deficit * 9));
+  const verdict = acc >= 72 ? ['g','RESOLVED'] : acc >= 45 ? ['y','MESSY SAVE'] : ['r','CALL FAILED'];
+  mapLog(`<span class="b">&gt; ${selHero.name}</span> dispatched to <span class="o">${selCall.name}</span>`);
+  mapLog(`<span class="${verdict[0]}">&gt; ${verdict[1]}</span> — accuracy ${acc}%`);
+  document.getElementById('call_' + selCall.id).classList.add('done');
+  document.getElementById('call_' + selCall.id).classList.remove('sel');
+  const heroCard = document.getElementById('hero_' + selHero.name);
+  heroCard.classList.add('out'); heroCard.classList.remove('sel');
+  setTimeout(((h) => () => h.classList.remove('out'))(heroCard), 9000);
+  openCalls--;
+  document.getElementById('mapStatus').textContent =
+    openCalls > 0 ? openCalls + ' open call' + (openCalls > 1 ? 's' : '') : 'district quiet';
+  renderReport(selCall, selHero, acc);
+  document.getElementById('briefText').innerHTML =
+    `<b>Unit en route.</b> Outcome plotted on the <b>Skill Report</b> tab. ${openCalls > 0 ? 'Pick the next call.' : 'Shift board is clear.'}`;
+  document.getElementById('briefReq').innerHTML = '';
+  selCall = null; selHero = null;
+  syncSend();
+});
+function mapLog(html){
+  const f = document.getElementById('mapFeed');
+  f.insertAdjacentHTML('afterbegin', `<div>${html}</div>`);
+}
 
-  if (text.includes('fire')) riskDelta -= 10;
-  if (text.includes('rescue')) riskDelta -= 8;
-  if (text.includes('delivery')) riskDelta -= 4;
-  if (text.includes('cat')) moraleDelta += 6;
-  if (text.includes('power')) riskDelta -= 5;
+/* ---------- skill report ---------- */
+function renderReport(call, hero, acc){
+  const svg = document.getElementById('pentSvg');
+  const cx = 210, cy = 196, R = 138;
+  let rings = '';
+  for (let i = 1; i <= 4; i++){
+    rings += `<polygon class="pgrid" points="${fullPent(cx,cy,R*i/4)}"/>`;
+  }
+  let spokes = '', labels = '';
+  SKILLS.forEach((k,i) => {
+    const a = -Math.PI/2 + i * (Math.PI*2/5);
+    const x = cx + R*Math.cos(a), y = cy + R*Math.sin(a);
+    spokes += `<line class="pgrid" x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"/>`;
+    const lx = cx + (R+26)*Math.cos(a), ly = cy + (R+26)*Math.sin(a);
+    labels += `<text class="axisLbl" x="${lx.toFixed(1)}" y="${(ly+4).toFixed(1)}">${SKILL_ABBR[i]}</text>`;
+  });
+  svg.innerHTML = rings + spokes +
+    `<polygon class="pReq" points="${pentPoints(cx,cy,R,call.req)}"/>` +
+    `<polygon class="pHero" points="${pentPoints(cx,cy,R,hero.stats)}"/>` + labels;
+  document.getElementById('reportWho').textContent = hero.name + ' → ' + call.name;
+  document.getElementById('accVal').textContent = acc + '%';
+}
+renderReport(calls[0], heroes[0], 87); // sample plot on load
 
-  state.risk = Math.max(0, Math.min(100, state.risk + riskDelta));
-  state.morale = Math.max(0, Math.min(100, state.morale + moraleDelta));
+/* ---------- hacking minigame ---------- */
+const NX = c => 54 + c * 96;
+const NY = r => 52 + r * 84;
+const START = '0,2', EXIT = '7,2';
+const PASS_NODE = '0,0', LOCK_NODE = '5,1', BATT_NODE = '0,4', GATE_NODE = '5,3';
+const GAP_EDGE = key('3,2','4,2');
+const EDGES = [
+  ['0,2','0,1'],['0,1','1,1'],['1,1','1,0'],['1,0','0,0'],['1,0','2,0'],['2,0','3,0'],
+  ['3,0','3,1'],['3,1','2,1'],['2,1','2,2'],['0,2','1,2'],['1,2','2,2'],['2,2','3,2'],
+  ['1,2','1,3'],['1,3','1,4'],['1,4','0,4'],['1,4','2,4'],['2,4','2,3'],['2,3','3,3'],['3,3','3,2'],
+  ['3,2','4,2'],
+  ['4,2','4,1'],['4,1','5,1'],['5,1','6,1'],['6,1','6,2'],['6,2','7,2'],
+  ['4,2','4,3'],['4,3','5,3'],['5,3','6,3'],['6,3','6,2'],
+];
+const PATROL = ['4,1','5,1','6,1','6,2','6,3','5,3','4,3','4,2'];
+function key(a, b){ return [a,b].sort().join('|'); }
+const edgeSet = new Set(EDGES.map(e => key(e[0], e[1])));
+const nodeIds = [...new Set(EDGES.flat())];
 
-  const statEls = document.querySelectorAll('.stat strong');
-  if (statEls[0]) statEls[0].textContent = `${state.risk}%`;
-  if (statEls[1]) statEls[1].textContent = `${state.morale}%`;
+let H; // hack state
+const svgEl = document.getElementById('hackSvg');
+const hackFill = document.getElementById('hackFill');
+let hackTimerId = null;
 
-  const bar = document.querySelector('.bar > div');
-  if (bar) bar.style.width = `${Math.max(10, 100 - state.risk)}%`;
+function hexPts(cx, cy, r){
+  let p = [];
+  for (let i = 0; i < 6; i++){
+    const a = Math.PI/6 + i*Math.PI/3;
+    p.push((cx + r*Math.cos(a)).toFixed(1) + ',' + (cy + r*Math.sin(a)).toFixed(1));
+  }
+  return p.join(' ');
+}
+function pos(id){ const [c,r] = id.split(',').map(Number); return [NX(c), NY(r)]; }
 
-  if (heroCard) {
-    heroCard.classList.add('assigned');
-    setTimeout(() => heroCard.classList.remove('assigned'), 500);
+function buildHackSvg(){
+  let s = '';
+  edgeSet.forEach(k => {
+    const [a,b] = k.split('|');
+    const [x1,y1] = pos(a), [x2,y2] = pos(b);
+    if (k === GAP_EDGE){
+      s += `<line id="gapLine" class="gapline" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+      s += `<text id="gapIcon" class="icoTxt" x="${(x1+x2)/2}" y="${(y1+y2)/2 - 14}" fill="#ff8a2a">⚒</text>`;
+    } else {
+      s += `<line class="trace" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+    }
+  });
+  nodeIds.forEach(id => {
+    const [x,y] = pos(id);
+    if (id === EXIT){
+      s += `<polygon class="exitHex" points="${hexPts(x,y,20)}"/>`;
+      s += `<text class="icoTxt" x="${x}" y="${y}" fill="#49e06b" style="font-size:11px">EXIT</text>`;
+    } else {
+      s += `<circle class="nd" id="nd_${id.replace(',','_')}" cx="${x}" cy="${y}" r="11"/>`;
+    }
+  });
+  const put = (id, glyph, fill, extra) => {
+    const [x,y] = pos(id);
+    return `<text id="${extra}" class="icoTxt" x="${x}" y="${y-20}" fill="${fill}">${glyph}</text>`;
+  };
+  s += put(PASS_NODE, 'PW', '#ffd166', 'icoPass');
+  s += put(LOCK_NODE, '🔒', '#ff3b57', 'icoLock');
+  s += put(BATT_NODE, '⚡', '#ffd166', 'icoBatt');
+  s += put(GATE_NODE, '▣', '#8b94ab', 'icoGate');
+  const [sx,sy] = pos(START);
+  s += `<text class="icoTxt" x="${sx}" y="${sy+26}" fill="#8b94ab" style="font-size:10px;letter-spacing:2px">ENTRY</text>`;
+  s += `<polygon id="virus" class="virus" points="0,-11 11,0 0,11 -11,0"/>`;
+  s += `<circle id="avRing" class="avring" r="15"/>`;
+  s += `<circle id="avatar" class="avatar" r="9"/>`;
+  svgEl.innerHTML = s;
+}
+buildHackSvg();
+
+function hackReset(){
+  H = {
+    at: START, started: false, over: false,
+    t: 90, max: 90,
+    bridge: false, pass: false, charge: false, gate: false,
+    avIdx: 0, visited: new Set([START]),
+  };
+  clearInterval(hackTimerId); hackTimerId = null;
+  document.getElementById('bridgeOver').classList.remove('on');
+  document.getElementById('endOver').classList.remove('on');
+  document.getElementById('gapLine').classList.remove('built');
+  document.getElementById('gapIcon').textContent = '⚒';
+  document.getElementById('icoLock').textContent = '🔒';
+  document.getElementById('icoGate').setAttribute('fill', '#8b94ab');
+  document.getElementById('avatar').classList.remove('charged');
+  nodeIds.forEach(id => {
+    const el = document.getElementById('nd_' + id.replace(',','_'));
+    if (el) el.classList.remove('visited');
+  });
+  ['pillPass','pillCharge','pillBridge'].forEach(id => document.getElementById(id).classList.remove('on'));
+  hackFill.style.width = '100%';
+  placeActor('avatar', H.at); placeActor('avRing', H.at);
+  placeActor('virus', PATROL[0]);
+  hackLog('<span class="b">&gt; run reset</span> — avatar at entry');
+}
+function placeActor(id, node){
+  const [x,y] = pos(node);
+  document.getElementById(id).setAttribute('transform', `translate(${x},${y})`);
+}
+function hackLog(html){
+  const f = document.getElementById('hackFeed');
+  f.insertAdjacentHTML('afterbegin', `<div>${html}</div>`);
+}
+function startClock(){
+  if (hackTimerId) return;
+  H.started = true;
+  hackTimerId = setInterval(() => {
+    if (H.over) return;
+    H.t -= 0.2;
+    hackFill.style.width = Math.max(0, H.t / H.max * 100) + '%';
+    if (H.t <= 0) hackEnd(false, 'The trace caught up. Orange bar hit zero.');
+  }, 200);
+}
+function hackEnd(win, msg){
+  H.over = true;
+  clearInterval(hackTimerId); hackTimerId = null;
+  const h = document.getElementById('endH');
+  h.textContent = win ? 'Access Granted' : 'Trace Locked';
+  h.className = 'h ' + (win ? 'win' : 'lose');
+  document.getElementById('endS').textContent = msg;
+  document.getElementById('endOver').classList.add('on');
+  hackLog(win ? '<span class="g">&gt; ACCESS GRANTED</span>' : '<span class="r">&gt; TRACE LOCKED — run failed</span>');
+}
+
+let bridgeState = null;
+function openBridgeQte(){
+  const arrows = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
+  const seq = Array.from({length:4}, () => arrows[Math.floor(Math.random()*4)]);
+  bridgeState = { seq, i: 0 };
+  drawBridgeSeq();
+  document.getElementById('bridgeOver').classList.add('on');
+}
+const ARROW_GLYPH = { ArrowUp:'↑', ArrowDown:'↓', ArrowLeft:'←', ArrowRight:'→' };
+function drawBridgeSeq(){
+  document.getElementById('bridgeSeq').innerHTML = bridgeState.seq.map((k,i) =>
+    `<span class="key ${i < bridgeState.i ? 'hit' : i === bridgeState.i ? 'now' : ''}">${ARROW_GLYPH[k]}</span>`
+  ).join('');
+}
+function bridgeKey(k){
+  if (!bridgeState) return;
+  if (k === bridgeState.seq[bridgeState.i]){
+    bridgeState.i++;
+    if (bridgeState.i >= bridgeState.seq.length){
+      H.bridge = true;
+      bridgeState = null;
+      document.getElementById('bridgeOver').classList.remove('on');
+      document.getElementById('gapLine').classList.add('built');
+      document.getElementById('gapIcon').textContent = '';
+      document.getElementById('pillBridge').classList.add('on');
+      hackLog('<span class="g">&gt; bridge built</span> — gap spanned');
+      doMoveTo('4,2');
+      return;
+    }
+  } else {
+    bridgeState.i = 0;
+  }
+  drawBridgeSeq();
+}
+
+function hackMove(dc, dr){
+  if (!H || H.over || bridgeState) return;
+  const [c,r] = H.at.split(',').map(Number);
+  const target = (c+dc) + ',' + (r+dr);
+  const k = key(H.at, target);
+  if (!edgeSet.has(k)) return;
+  startClock();
+  if (k === GAP_EDGE && !H.bridge){ openBridgeQte(); return; }
+  if (target === LOCK_NODE && !H.pass){
+    hackLog('<span class="r">&gt; 🔒 locked</span> — find the PW node first');
+    return;
+  }
+  if (target === GATE_NODE && !H.gate && !H.charge){
+    hackLog('<span class="r">&gt; ▣ gate is dead</span> — bring the ⚡ charge');
+    return;
+  }
+  doMoveTo(target);
+}
+function doMoveTo(target){
+  H.at = target;
+  H.visited.add(target);
+  const nd = document.getElementById('nd_' + target.replace(',','_'));
+  if (nd) nd.classList.add('visited');
+  placeActor('avatar', target); placeActor('avRing', target);
+
+  if (target === PASS_NODE && !H.pass){
+    H.pass = true;
+    document.getElementById('icoLock').textContent = '🔓';
+    document.getElementById('pillPass').classList.add('on');
+    hackLog('<span class="y">&gt; password lifted</span> — 🔒 is now open');
+  }
+  if (target === BATT_NODE && !H.charge && !H.gate){
+    H.charge = true;
+    document.getElementById('avatar').classList.add('charged');
+    document.getElementById('pillCharge').classList.add('on');
+    hackLog('<span class="y">&gt; ⚡ charge acquired</span> — avatar is hot');
+  }
+  if (target === GATE_NODE && H.charge){
+    H.charge = false; H.gate = true;
+    document.getElementById('avatar').classList.remove('charged');
+    document.getElementById('icoGate').setAttribute('fill', '#49e06b');
+    hackLog('<span class="g">&gt; gate powered</span> — route open');
+  }
+  if (target === EXIT){
+    const left = Math.max(0, H.t);
+    hackEnd(true, `Node breached with ${Math.floor(left/60)}:${String(Math.floor(left%60)).padStart(2,'0')} on the trace.`);
+    return;
+  }
+  virusStep();
+}
+function virusStep(){
+  H.avIdx = (H.avIdx + 1) % PATROL.length;
+  const vAt = PATROL[H.avIdx];
+  placeActor('virus', vAt);
+  if (vAt === H.at){
+    H.t = Math.max(1, H.t - 10);
+    hackFill.style.width = (H.t / H.max * 100) + '%';
+    H.at = START;
+    placeActor('avatar', START); placeActor('avRing', START);
+    if (H.charge){
+      H.charge = false;
+      document.getElementById('avatar').classList.remove('charged');
+      document.getElementById('pillCharge').classList.remove('on');
+    }
+    hackLog('<span class="r">&gt; ◆ antivirus contact</span> — dumped to entry, −10s');
   }
 }
+hackReset();
 
-function renderFeed(task, heroName) {
-  const feed = document.querySelector('.feed');
-  if (!feed) return;
-
-  const lines = [
-    `<div><span class="g">&gt; ${heroName}</span> assigned to ${task}</div>`,
-    `<div><span class="c">&gt; risk</span> updated for current city load</div>`,
-    `<div><span class="y">&gt; morale</span> adjusted by assignment outcome</div>`,
-  ];
-
-  feed.innerHTML = lines.join('') + `<div>&gt; <span class="c">assignment locked</span></div>`;
+/* ---------- QTE trainer ---------- */
+let trainer = null, qteBest = 0;
+document.getElementById('qteStart').addEventListener('click', startTrainer);
+function startTrainer(){
+  trainer = { seq: [], i: 0, round: 0, streak: 0 };
+  nextTrainerSeq();
+  document.getElementById('qteHint').textContent = 'Go! Wrong key resets the pattern and your streak.';
 }
+function nextTrainerSeq(){
+  const arrows = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
+  trainer.round++;
+  trainer.i = 0;
+  const len = Math.min(3 + Math.floor(trainer.round / 2), 7);
+  trainer.seq = Array.from({length: len}, () => arrows[Math.floor(Math.random()*4)]);
+  document.getElementById('qteRound').textContent = String(trainer.round).padStart(2,'0');
+  drawTrainer();
+}
+function drawTrainer(){
+  document.getElementById('qteSeq').innerHTML = trainer.seq.map((k,i) =>
+    `<span class="key ${i < trainer.i ? 'hit' : i === trainer.i ? 'now' : ''}">${ARROW_GLYPH[k]}</span>`
+  ).join('');
+}
+function trainerKey(k){
+  if (!trainer) return;
+  if (k === trainer.seq[trainer.i]){
+    trainer.i++;
+    if (trainer.i >= trainer.seq.length){
+      trainer.streak++;
+      qteBest = Math.max(qteBest, trainer.streak);
+      document.getElementById('qteStreak').textContent = trainer.streak;
+      document.getElementById('qteBest').textContent = qteBest;
+      nextTrainerSeq();
+      return;
+    }
+  } else {
+    trainer.i = 0;
+    trainer.streak = 0;
+    document.getElementById('qteStreak').textContent = '0';
+  }
+  drawTrainer();
+}
+
+/* ---------- global keys ---------- */
+const DIRS = { ArrowUp:[0,-1], ArrowDown:[0,1], ArrowLeft:[-1,0], ArrowRight:[1,0] };
+document.addEventListener('keydown', e => {
+  if (!(e.key in DIRS)) return;
+  if (bridgeState){ e.preventDefault(); bridgeKey(e.key); return; }
+  if (activeTab === 'hack'){ e.preventDefault(); const [dc,dr] = DIRS[e.key]; hackMove(dc,dr); return; }
+  if (activeTab === 'qte' && trainer){ e.preventDefault(); trainerKey(e.key); }
+});
 </script>
 </body>
 </html>
