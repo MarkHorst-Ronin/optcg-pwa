@@ -30,136 +30,19 @@
   html{background:#020203;min-height:100vh}
   body{
     margin:0;min-height:100vh;
-    background:radial-gradient(ellipse at 50% 38%,#0c0c18 0%,#020203 72%);
-    display:flex;align-items:center;justify-content:center;
-    padding:20px;
+    background:
+      radial-gradient(circle at 12% -4%, rgba(30,90,255,.09), transparent 32%),
+      radial-gradient(circle at 88% 102%, rgba(10,40,160,.08), transparent 30%),
+      linear-gradient(180deg,#060a14 0%,#04070f 55%,#020408 100%);
+    padding:28px 20px;
     color:var(--text);
     font-family:Oswald,"Barlow Condensed",Arial,sans-serif;
     font-size:16.5px;letter-spacing:.01em;
   }
 
-  /* ── TV outer ── */
-  .tv-outer{width:100%;max-width:1520px}
-
-  /* ── physical CRT bezel ── */
-  .tv-bezel{
-    position:relative;
-    background:linear-gradient(158deg,#2d2d2d 0%,#1c1c1c 32%,#101010 66%,#080808 100%);
-    border-radius:30px;
-    padding:18px 24px 54px;
-    box-shadow:
-      inset 0 3px 5px rgba(255,255,255,.09),
-      inset 0 -3px 8px rgba(0,0,0,.7),
-      inset 2px 0 4px rgba(255,255,255,.025),
-      inset -2px 0 4px rgba(255,255,255,.025),
-      0 0 0 1px #3a3a3a,
-      0 0 0 3px #060606,
-      0 50px 130px rgba(0,0,0,.98),
-      0 12px 32px rgba(0,0,0,.75);
-  }
-  .bezel-top{
-    display:flex;justify-content:space-between;align-items:center;
-    padding:0 6px 14px;
-  }
-  .bezel-brand{
-    font-family:"Archivo Black",sans-serif;
-    font-size:9.5px;letter-spacing:.6em;color:#2c2c2c;text-transform:uppercase;
-  }
-  .bezel-model{
-    font-size:8.5px;letter-spacing:.35em;color:#1e1e1e;
-    font-family:ui-monospace,monospace;text-transform:uppercase;
-  }
-
-  /* ── the screen ── */
-  .tv-screen{
-    position:relative;
-    border-radius:10px;
-    overflow:hidden;
-    background:#000;
-    /* amber phosphor glow spilling onto desk */
-    box-shadow:
-      0 0 40px rgba(30,90,255,.18),
-      0 0 90px rgba(20,60,220,.07),
-      inset 0 0 0 1px #000,
-      inset 0 0 80px rgba(0,0,0,.3);
-    /* subtle screen flicker */
-    animation:crtFlicker 20s ease-in-out infinite;
-  }
-  @keyframes crtFlicker{
-    0%,86%,89.5%,93%,96.5%,100%{opacity:1}
-    87%{opacity:.96}
-    88.5%{opacity:.99}
-    90%{opacity:.93}
-    91%{opacity:1}
-    93.8%{opacity:.95}
-    94.5%{opacity:1}
-    96.8%{opacity:.97}
-    97.2%{opacity:1}
-  }
-
-  /* scan lines — the defining CRT element */
-  .tv-screen::before{
-    content:"";position:absolute;inset:0;
-    background:repeating-linear-gradient(
-      0deg,
-      rgba(0,0,0,.14) 0px,
-      rgba(0,0,0,.14) 1px,
-      transparent 1px,
-      transparent 3px
-    );
-    pointer-events:none;z-index:1000;mix-blend-mode:multiply;
-  }
-
-  /* corner vignette + phosphor bloom from top + screen glare */
-  .tv-screen::after{
-    content:"";position:absolute;inset:0;
-    background:
-      radial-gradient(ellipse at 50% 50%, transparent 60%, rgba(0,0,0,.55) 100%),
-      radial-gradient(ellipse at 50% -6%, rgba(30,90,255,.12) 0%, transparent 52%),
-      linear-gradient(148deg, rgba(255,255,255,.04) 0%, transparent 28%);
-    pointer-events:none;z-index:999;
-  }
-
-  /* secondary phosphor glow lines between scan lines */
-  .phosphor-bloom{
-    position:absolute;inset:0;pointer-events:none;z-index:998;
-    background:repeating-linear-gradient(
-      0deg,transparent 0,transparent 5px,
-      rgba(30,90,255,.010) 5px,rgba(30,90,255,.010) 6px
-    );
-  }
-
-  /* warm sepia tint makes everything read like a phosphor screen */
-  .screen-content{
-    position:relative;
-    filter:brightness(1.07) contrast(1.07);
-  }
-
-  /* ── bezel bottom: speaker grille + brand + LED ── */
-  .bezel-bottom{
-    display:flex;justify-content:center;align-items:center;gap:22px;
-    padding:14px 8px 0;
-  }
-  .bezel-grille{display:flex;gap:3px;align-items:center}
-  .grille-slot{width:2px;height:13px;background:linear-gradient(180deg,#1c1c1c,#0e0e0e);border-radius:1px}
-  .bezel-bottom-brand{
-    font-family:"Archivo Black",sans-serif;
-    font-size:9px;letter-spacing:.55em;color:#222;text-transform:uppercase;
-  }
-  .power-led{
-    width:8px;height:8px;border-radius:50%;
-    background:#14b045;
-    box-shadow:0 0 5px #14b045,0 0 14px rgba(20,176,69,.55),0 0 28px rgba(20,176,69,.2);
-    animation:ledPulse 3.2s ease-in-out infinite;
-  }
-  @keyframes ledPulse{
-    0%,100%{opacity:1;box-shadow:0 0 5px #14b045,0 0 14px rgba(20,176,69,.55)}
-    50%{opacity:.68;box-shadow:0 0 3px #14b045,0 0 7px rgba(20,176,69,.3)}
-  }
-
   /* ── console UI ── */
-  .wrap{max-width:100%;margin:0 auto;position:relative;z-index:3}
-  .console{background:var(--bg);border:none;border-radius:0;overflow:hidden}
+  .wrap{max-width:1520px;margin:0 auto;position:relative}
+  .console{background:var(--bg);border:2px solid var(--hair);border-radius:16px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.65)}
 
   /* masthead */
   .masthead{
@@ -494,20 +377,8 @@
 </head>
 <body>
 
-<div class="tv-outer">
-  <!-- Physical CRT monitor bezel -->
-  <div class="tv-bezel">
-    <div class="bezel-top">
-      <div class="bezel-brand">SDN Systems</div>
-      <div class="bezel-model">MDT-7714 &nbsp;·&nbsp; Dispatch Terminal</div>
-    </div>
-
-    <!-- The screen with CRT effects -->
-    <div class="tv-screen">
-      <div class="phosphor-bloom"></div>
-      <div class="screen-content">
-        <div class="wrap">
-          <div class="console">
+<div class="wrap">
+  <div class="console">
 
             <div class="masthead">
               <div>
@@ -679,30 +550,8 @@
               Fan-made UI study inspired by the minigames in <b>Dispatch</b> (AdHoc Studio, 2025). Recreated from scratch for design reference — not affiliated with or endorsed by AdHoc Studio; no original game assets, art, or text are used.
             </div>
 
-          </div><!-- .console -->
-        </div><!-- .wrap -->
-      </div><!-- .screen-content -->
-    </div><!-- .tv-screen -->
-
-    <div class="bezel-bottom">
-      <div class="bezel-grille">
-        <div class="grille-slot"></div><div class="grille-slot"></div><div class="grille-slot"></div>
-        <div class="grille-slot"></div><div class="grille-slot"></div><div class="grille-slot"></div>
-        <div class="grille-slot"></div><div class="grille-slot"></div><div class="grille-slot"></div>
-        <div class="grille-slot"></div><div class="grille-slot"></div><div class="grille-slot"></div>
-      </div>
-      <div class="bezel-bottom-brand">SDN Systems &nbsp;·&nbsp; Night Shift Terminal</div>
-      <div class="power-led" title="System active"></div>
-      <div class="bezel-grille">
-        <div class="grille-slot"></div><div class="grille-slot"></div><div class="grille-slot"></div>
-        <div class="grille-slot"></div><div class="grille-slot"></div><div class="grille-slot"></div>
-        <div class="grille-slot"></div><div class="grille-slot"></div><div class="grille-slot"></div>
-        <div class="grille-slot"></div><div class="grille-slot"></div><div class="grille-slot"></div>
-      </div>
-    </div>
-
-  </div><!-- .tv-bezel -->
-</div><!-- .tv-outer -->
+  </div><!-- .console -->
+</div><!-- .wrap -->
 
 <script>
 /* ---------- tabs ---------- */
